@@ -6,9 +6,13 @@ term = blessed.Terminal()
 
 
 # other functions
-...
-...
-...
+def config():
+
+    return
+
+def board():
+
+    return map_path
 
 
 
