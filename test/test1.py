@@ -1,5 +1,5 @@
 from blessed import Terminal
-
+print("Travail sérieux")
 term = Terminal()
 
 print(term.home + term.clear + term.move_y(term.height // 2))
