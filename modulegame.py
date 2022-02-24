@@ -1,13 +1,11 @@
 #-*- coding: utf-8 -*-
-
 import blessed, math, os, time
 term = blessed.Terminal()
 
 
-
 # other functions
 def config():
-
+    
     return
 
 def board():
