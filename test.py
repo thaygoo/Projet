@@ -31,4 +31,4 @@ def config(file):
     return config
 
 #print(config('map.ano'))
-board(20,10,term.black)
+board(20,20,term.black)
