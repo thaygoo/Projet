@@ -8,9 +8,21 @@ def config():
 
     return
 
-def board():
+def board(lenght):
+    color = term.red
+    lenght = 20
+    # clear screen and hide cursor
     print(term.home + term.clear + term.hide_cursor)
-    return 
+
+    #header
+    print(color + '\u2554'+3*'\u2550'+(int(lenght)-1)*('\u2566'+3*'\u2550')+'\u2557')
+    print(color + '\u2551'+lenght*(3*'\u0020'+'\u2551'))
+    #body
+    for i in range(lenght-1):
+        print(color + '\u2560'+(int(lenght)-1)*(3*'\u2550'+'\u256C')+3*'\u2550'+'\u2563')
+        print(color + '\u2551'+lenght*(3*'\u0020'+'\u2551'))
+    #foot
+    print(color + '\u255A'+3*'\u2550'+(int(lenght)-1)*('\u2569'+3*'\u2550')+'\u255D')
 
 
 # main function
