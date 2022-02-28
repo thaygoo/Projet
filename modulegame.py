@@ -2,16 +2,19 @@
 import blessed, math, os, time
 term = blessed.Terminal()
 
-
 # other functions
 def config():
 
     return
 
-def board(lenght):
+def board(width, height, color):
     """Creation of the board, place all the things on it.
 
-    
+    Parameters
+    ----------
+    width (int) : width of the board
+    height (int) : height of the board
+    color (str) : color of the board
 
     Return
     ------
@@ -20,22 +23,27 @@ def board(lenght):
 
     Version
     -------
-    specification: Hugo (v1 17/02/22)
+    specification: Hugo (v2 28/02/22)
     """
-    color = term.red
-    lenght = 20
-    # clear screen and hide cursor
-    print(term.home + term.clear + term.hide_cursor)
+    # background + cursor + clear + hide cursor
+    print(term.on_darkslategray4 + term.home + term.clear + term.hide_cursor)
 
     #header
-    print(color + '\u2554'+3*'\u2550'+(int(lenght)-1)*('\u2566'+3*'\u2550')+'\u2557')
-    print(color + '\u2551'+lenght*(3*'\u0020'+'\u2551'))
+    print(term.center(color + '\u2554' + 3 * '\u2550' + (int(width) - 1) * ('\u2566' + 3 * '\u2550') + '\u2557'))
+    print(term.center(color + '\u2551' + width * (3 * '\u0020' + '\u2551')))
+
     #body
-    for i in range(lenght-1):
-        print(color + '\u2560'+(int(lenght)-1)*(3*'\u2550'+'\u256C')+3*'\u2550'+'\u2563')
-        print(color + '\u2551'+lenght*(3*'\u0020'+'\u2551'))
+    for i in range(height - 1):
+        print(term.center(color + '\u2560' + (int(width) - 1) * (3 * '\u2550' + '\u256C') + 3 * '\u2550' + '\u2563'))
+        print(term.center(color + '\u2551' + width * (3 * '\u0020' + '\u2551')))
+        
     #foot
-    print(color + '\u255A'+3*'\u2550'+(int(lenght)-1)*('\u2569'+3*'\u2550')+'\u255D')
+    print(term.center(color + '\u255A' + 3 * '\u2550' + (int(width) - 1) * ('\u2569' + 3 * '\u2550') + '\u255D'))
+
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 
 # main function
