@@ -9,6 +9,19 @@ def config():
     return
 
 def board(lenght):
+    """Creation of the board, place all the things on it.
+
+    
+
+    Return
+    ------
+    plate (dic) : board
+    dic (dic) : everything, like berry or wolves
+
+    Version
+    -------
+    specification: Hugo (v1 17/02/22)
+    """
     color = term.red
     lenght = 20
     # clear screen and hide cursor
