@@ -2,7 +2,7 @@ import blessed, math, os, time
 term = blessed.Terminal()
 #https://www.fileformat.info/info/unicode/block/box_drawing/images.htm
 
-def board(width, height, color):
+def board(width, height, color): # RETIRER LE CENTER ET LE FAIRE MANUELLEMENT
     # background + cursor + clear + hide cursor
     print(term.on_darkslategray4 + term.home + term.clear)
 
@@ -24,25 +24,27 @@ def config(file):
     with open(file) as fp:
         line = fp.readline()
         while line:
-            if 'map:' in line.strip():
+            if 'map:' in line:
                 line = fp.readline()
                 line = line.rsplit(" ")
                 line[1] = line[1].rstrip("\n")
                 config['map'] = line
 
-            elif 'werewolves:' in line.strip():
+            elif 'werewolves:' in line:
                 line = fp.readline()
-                while 'foods:' not in line.strip():
-                    if 'alpha' in line.strip():
-                        config[int(line.strip()[0])]['alpha'] = [int(line.strip().split(' ').pop(1)), int(line.strip().split(' ').pop(2)), int(100)]
-                    elif 'omega' in line.strip():
-                        config[int(line.strip()[0])]['omega'] = [int(line.strip().split(' ').pop(1)), int(line.strip().split(' ').pop(2)), int(100)]
+                while 'foods:' not in line:
+                    if 'alpha' in line:
+                        config[int(line[0])]['alpha'] = [int(line.split(' ').pop(1)), int(line.split(' ').pop(2)), int(100)]
+                    elif 'omega' in line:
+                        config[int(line[0])]['omega'] = [int(line.split(' ').pop(1)), int(line.split(' ').pop(2)), int(100)]
                     else:
-                        config[int(line.strip()[0])]['normal'].append([int(line.strip().split(' ').pop(1)), int(line.strip().split(' ').pop(2)), int(100)])
+                        config[int(line[0])]['normal'].append([int(line.split(' ').pop(1)), int(line.split(' ').pop(2)), int(100)])
                     line = fp.readline()
+            elif 'foods:' in line:
+                1+1
             line = fp.readline()
     return config
 
 dic = config('map.ano')
-print('\n', dic[1], '\n\n', dic[2], '\n\n', dic['food'])
+#print('\n', dic[1], '\n\n', dic[2], '\n\n', dic['food'])
 #board(8,8,term.black)
