@@ -72,10 +72,11 @@ def config(file):
             line = fp.readline()
     return config
 
-#dic = config('map.ano')
-#print('\n', dic[1], '\n\n', dic[2], '\n\n', dic['food'])
-board(20,20,term.gold)
+dic = config('map.ano')
+print('\n', dic[1], '\n\n', dic[2], '\n\n', dic['food'])
 
-print(term.on_normal + term.move_xy(coos(10,19)[0], coos(10,19)[1]) + '\u29BB')
+#board(20,20,term.gold)
 
-print(term.red + term.move_xy(100, 45) + '')
+#print(term.on_normal + term.move_xy(coos(10,19)[0], coos(10,19)[1]) + '\u29BB')
+
+#print(term.red + term.move_xy(100, 45) + '')
