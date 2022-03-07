@@ -31,12 +31,36 @@ def board(width, height, color): # REGLER LE SOUCIS DU Y
     #foot
     print(term.move_xy(center, height*2) + color + '╚' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╝', end='')
 
-def coos(x, y):
-    r = []
+    #placing objects
+    #Placing Alphas :
+
+    for i in ['alpha', "α"], ['omega', "Ω"]:
+        for j in [1, term.bold_red], [2, term.bold_green]:
+            # display alpha and omega
+            print(term.move_xy(*coordinate(*config('map.ano')[j[0]][i[0]][:2])) + j[1] + i[1])
+            #display energy
+            print(term.move_xy((coordinate(*config('map.ano')[j[0]][i[0]][:2])[0])-1, (coordinate(*config('map.ano')[j[0]][i[0]][:2])[1])+1) + j[1] + '%d' % (config('map.ano')[j[0]][i[0]][2]))
+
+    # Placing normal wolves:
+    for j in [1, "\u29BF", term.bold_red], [2, "\u29BF", term.bold_green]:
+        for i in config('map.ano')[j[0]]['normal']:
+            print(term.move_xy(*coordinate(*i[:2])) + j[2] + j[1])
+            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[2] + '%d' % (i[2]))
+
+    #place foods
+    for j in ['berries', '\N{CHERRIES}'], ['apples', '\N{RED APPLE}'], ['mice', '\N{RAT}'], ['rabbits', '\N{RABBIT FACE}'], ['deers', '\N{OX}']: 
+        for i in config('map.ano')['food'][j[0]]:
+            # Display foods
+            print(term.move_xy(*coordinate(*i[:2])) + j[1])
+            # Display energy of foods
+            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + term.turquoise + '%d' % (i[2]))
+    
+
+def coordinate(x, y):
     home = int(term.width/2) - int(((4 * 20)+1)/2)
-    r.append(home+(2+(4*(x-1))))
-    r.append((y*2)-1)
-    return r
+    x = home+(2+(4*(x-1)))
+    y = (y*2)-1
+    return x, y
 
 def config(file):
     config = {
@@ -57,26 +81,30 @@ def config(file):
 
             elif 'werewolves:' in line:
                 line = fp.readline()
-                while 'foods:' not in line:
-                    if 'alpha' in line:
-                        config[int(line[0])]['alpha'] = [int(line.split(' ').pop(1)), int(line.split(' ').pop(2)), int(100)]
-                    elif 'omega' in line:
-                        config[int(line[0])]['omega'] = [int(line.split(' ').pop(1)), int(line.split(' ').pop(2)), int(100)]
+                while 'foods:' not in line: # Is food in the line ?
+                    if 'alpha' in line or 'omega' in line:
+                        config[int(line[0])][line.split(' ')[3].rstrip("\n")] = [int(line.split(' ')[1]), int(line.split(' ')[2]), int(100)]
                     else:
-                        config[int(line[0])]['normal'].append([int(line.split(' ').pop(1)), int(line.split(' ').pop(2)), int(100)])
+                        config[int(line[0])]['normal'].append([int(line.split(' ')[1]), int(line.split(' ')[2]), int(100)])
                     line = fp.readline()
 
-            print(line)
-            #elif 'foods:' in line:
-            #    print(line)
+            elif 'berries' in line or 'apples' in line or 'mice' in line or 'rabbits' in line or 'deers' in line:
+                config['food'][line.split(' ')[2]].append([int(line.split(' ')[0]), int(line.split(' ')[1]), int(line.split(' ')[3])])
+               
             line = fp.readline()
     return config
 
-dic = config('map.ano')
-print('\n', dic[1], '\n\n', dic[2], '\n\n', dic['food'])
+#dic = config('map.ano')
+
+#print(dic)
 
 #board(20,20,term.gold)
 
-#print(term.on_normal + term.move_xy(coos(10,19)[0], coos(10,19)[1]) + '\u29BB')
+#x, y = coordinate(2,1)
+#print(term.move_xy(x, y) + term.on_normal + term.black + '\u29BB')
 
 #print(term.red + term.move_xy(100, 45) + '')
+
+""" for i in range(2000): 
+    print(term.red + term.move_xy(10, 20) + "%d" % i)
+    time.sleep(0.01) """

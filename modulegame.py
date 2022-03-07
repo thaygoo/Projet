@@ -3,11 +3,45 @@ import blessed, math, os, time
 term = blessed.Terminal()
 
 # other functions
-def config():
+def config(file):
+    config = {
+        1:{'alpha': '', 'omega': '', 'normal': []}, 
+        2:{'alpha': '', 'omega': '', 'normal': []}, 
+        "food":{'berries': [], 'apples': [], 'mice': [], 'rabbits': [], 'deers': []}, 
+        'map':()
+    } # Dictionnary of the configuration file
 
-    return
+    with open(file) as fp: # Open the file
+        line = fp.readline()
+        while line:
+            if 'map:' in line: # Is map in the line ? 
+                line = fp.readline() 
+                line = line.rsplit(" ") # Split coo's
+                line[1] = line[1].rstrip("\n") # Keep only the coo's
+                config['map'] = line 
 
-def board(width, height, color):
+            elif 'werewolves:' in line: # is wolve in the line ?
+                line = fp.readline()
+                while 'foods:' not in line: # Is food in the line ?
+                    if 'alpha' in line or 'omega' in line: 
+                        config[int(line[0])][line.split(' ')[3].rstrip("\n")] = [int(line.split(' ')[1]), int(line.split(' ')[2]), int(100)]
+                    else:
+                        config[int(line[0])]['normal'].append([int(line.split(' ')[1]), int(line.split(' ')[2]), int(100)])
+                    line = fp.readline()
+
+            elif 'berries' in line or 'apples' in line or 'mice' in line or 'rabbits' in line or 'deers' in line:
+                config['food'][line.split(' ')[2]].append([int(line.split(' ')[0]), int(line.split(' ')[1]), int(line.split(' ')[3])])
+               
+            line = fp.readline()
+    return config
+
+def coos(x, y):
+    home = int(term.width/2) - int(((4 * 20)+1)/2)
+    x = home+(2+(4*(x-1)))
+    y = (y*2)-1
+    return x, y
+
+def board(color):
     """Creation of the board, place all the things on it.
 
     Parameters
@@ -25,26 +59,38 @@ def board(width, height, color):
     -------
     specification: Hugo (v2 28/02/22)
     """
-    # background + cursor + clear + hide cursor
-    print(term.on_darkslategray4 + term.home + term.clear + term.hide_cursor)
+    width = int(config('map.ano')['map'][0])
+    height = int(config('map.ano')['map'][1])
+
+    # background + cursor + clear + hide cursor + term.on_darkslategray4
+    print(term.home + term.clear + term.on_dimgrey)
+
+    #Printing the board
+    #centered manualy
+    center = int(term.width/2) - int(((4 * width)+1)/2)
 
     #header
-    print(term.center(color + '\u2554' + 3 * '\u2550' + (int(width) - 1) * ('\u2566' + 3 * '\u2550') + '\u2557'))
-    print(term.center(color + '\u2551' + width * (3 * '\u0020' + '\u2551')))
+    print(term.move_xy(center, 0) + color + '╔' + 3 * '═' + (int(width) - 1) * ('╦' + 3 * '═') + '╗', end='')
+    print(term.move_xy(center, 1) + color + '║' + width * (3 * ' ' + '║'), end='')
 
     #body
+    y = 2
     for i in range(height - 1):
-        print(term.center(color + '\u2560' + (int(width) - 1) * (3 * '\u2550' + '\u256C') + 3 * '\u2550' + '\u2563'))
-        print(term.center(color + '\u2551' + width * (3 * '\u0020' + '\u2551')))
+        print(term.move_xy(center, i + y) + color + '╠' + (int(width) - 1) * (3 * '═' + '╬') + 3 * '═' + '╣', end='')
+        y += 1
+        print(term.move_xy(center, i + y) + color + '║' + width * (3 * ' ' + '║'), end='')
         
     #foot
-    print(term.center(color + '\u255A' + 3 * '\u2550' + (int(width) - 1) * ('\u2569' + 3 * '\u2550') + '\u255D'))
+    print(term.move_xy(center, height*2) + color + '╚' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╝', end='')
+
+    #placing objects
+
 
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
+board(term.gold)
 
 # main function
 def play_game(map_path, group_1, type_1, group_2, type_2):
@@ -66,7 +112,7 @@ def play_game(map_path, group_1, type_1, group_2, type_2):
     
     """
     
-    #...
+    
     #...
     #...
 
