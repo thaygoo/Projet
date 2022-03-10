@@ -114,7 +114,7 @@ def get_order(player, ):
 #print(dic) 
 
 
-board(20,20,term.gold)
+#board(20,20,term.gold)
 
 #x, y = coordinate(2,1)
 #print(term.move_xy(x, y) + term.on_normal + term.black + '\u29BB')
