@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-import blessed, time
+import blessed
 term = blessed.Terminal()
 
 # other functions
@@ -63,7 +63,7 @@ def coordinate(x, y):
     home = int(term.width/2) - int(((4 * 20)+1)/2)
     x = home+(2+(4*(x-1)))
     y = (y*2)-1
-    return x, y
+    return x, y + 1 
 
 def display():
     """Deals a problem encounter while displaying the final board.
@@ -72,7 +72,7 @@ def display():
     -------
     specification: Hugo (v1 08/03/22)
     """
-    print(term.normal + term.move_xy(int((4 * 20)+1), int((2 * 20)+1)) + ' ')
+    print(term.normal + term.move_xy(int((4 * 20)+1), int((2 * 20)+2)) + ' ')
 
 def board(width, height, color):
     """Creation of the board, place all the things on it.
@@ -89,24 +89,30 @@ def board(width, height, color):
     """
 
     # background + cursor + clear + hide cursor + term.on_darkslategray4
-    print(term.home + term.clear + term.on_dimgrey)
+    print(term.home + term.clear)
 
     #centered manualy
     center = int(term.width/2) - int(((4 * width)+1)/2)
 
     #header
-    print(term.move_xy(center, 0) + color + '╔' + 3 * '═' + (int(width) - 1) * ('╦' + 3 * '═') + '╗', end='')
-    print(term.move_xy(center, 1) + color + '║' + width * (3 * ' ' + '║'), end='')
+    for i in range(5, 21, 5):
+        print(term.normal + term.bold + term.move_xy(coordinate(i, 0)[0], 0) + color + f'{i}')
+
+    for i in range(5, 21, 5):
+        print(term.move_xy(int(term.width/2) - int(((4 * 20)+1)/2)-3, (i*2)) + f'{i}')
+
+    print(term.on_gray25 + term.move_xy(center, 1) + color + '╔' + 3 * '═' + (int(width) - 1) * ('╦' + 3 * '═') + '╗', end='')
+    print(term.move_xy(center, 2) + color + '║' + width * (3 * ' ' + '║'), end='')
 
     #body
-    y = 2
-    for i in range(height - 1):
+    y = 3
+    for i in range(height):
         print(term.move_xy(center, i + y) + color + '╠' + (int(width) - 1) * (3 * '═' + '╬') + 3 * '═' + '╣', end='')
         y += 1
         print(term.move_xy(center, i + y) + color + '║' + width * (3 * ' ' + '║'), end='')
         
     #foot
-    print(term.move_xy(center, height*2) + color + '╚' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╝', end='')
+    print(term.move_xy(center, (height*2)+1) + color + '╚' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╝', end='')
 
     #placing objects
     #Placing Alphas :
@@ -123,7 +129,7 @@ def board(width, height, color):
             # display normal wolves
             print(term.move_xy(*coordinate(*i[:2])) + j[2] + j[1])
             # display energy of them
-            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[2] + '%d' % (i[2]))
+            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[2] + f'{i[2]}')
 
     #place foods
     for j in ['berries', '\N{CHERRIES}'], ['apples', '\N{RED APPLE}'], ['mice', '\N{RAT}'], ['rabbits', '\N{RABBIT FACE}'], ['deers', '\N{OX}']: 
@@ -131,7 +137,9 @@ def board(width, height, color):
             # Display foods
             print(term.move_xy(*coordinate(*i[:2])) + j[1])
             # Display energy of foods
-            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + term.turquoise + '%d' % (i[2]))
+            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + term.turquoise + f'{i[2]}')
+
+    print(term.normal + term.move_xy(int(term.width/2) - int(((4 * 20)+1)/2), coordinate(0, 21)[1]) + (' ' * ((4 * width)+1)))
     
     display()
 
@@ -141,6 +149,7 @@ def board(width, height, color):
 
 
 board(20, 20, term.gold)
+
 
 # main function
 def play_game(map_path, group_1, type_1, group_2, type_2):

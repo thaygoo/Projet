@@ -1,35 +1,32 @@
-import blessed, math, os, time
+import blessed
 term = blessed.Terminal()
-# https://www.fileformat.info/info/unicode/block/box_drawing/images.htm
-# Alpha : \u29BB
-# Omega : \u25C9
-# Normal : \u29BF
-# Apple : 
-# Berry : 
-# Mice : 
-# Rabbit : 
-# Dear : 
 
-def board(width, height, color): # REGLER LE SOUCIS DU Y
+def board(width, height, color): 
     # background + cursor + clear + hide cursor + term.on_darkslategray4
-    print(term.home + term.clear + term.on_dimgrey)
+    print(term.home + term.clear)
 
     #centered manualy
     center = int(term.width/2) - int(((4 * width)+1)/2)
 
     #header
-    print(term.move_xy(center, 0) + color + '╔' + 3 * '═' + (int(width) - 1) * ('╦' + 3 * '═') + '╗', end='')
-    print(term.move_xy(center, 1) + color + '║' + width * (3 * ' ' + '║'), end='')
+    for i in range(5, 21, 5):
+        print(term.normal + term.move_xy(coordinate(i, 0)[0], 0) + color + '%d' % i)
+
+    for i in range(5, 21, 5):
+        print(term.move_xy(int(term.width/2) - int(((4 * 20)+1)/2)-3, (i*2)) + '%d' % i)
+
+    print(term.on_gray25 + term.move_xy(center, 1) + color + '╔' + 3 * '═' + (int(width) - 1) * ('╦' + 3 * '═') + '╗', end='')
+    print(term.move_xy(center, 2) + color + '║' + width * (3 * ' ' + '║'), end='')
 
     #body
-    y = 2
-    for i in range(height - 1):
+    y = 3
+    for i in range(height):
         print(term.move_xy(center, i + y) + color + '╠' + (int(width) - 1) * (3 * '═' + '╬') + 3 * '═' + '╣', end='')
         y += 1
         print(term.move_xy(center, i + y) + color + '║' + width * (3 * ' ' + '║'), end='')
         
     #foot
-    print(term.move_xy(center, height*2) + color + '╚' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╝', end='')
+    print(term.move_xy(center, (height*2)+1) + color + '╚' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╝', end='')
 
     #placing objects
     #Placing Alphas :
@@ -55,7 +52,9 @@ def board(width, height, color): # REGLER LE SOUCIS DU Y
             print(term.move_xy(*coordinate(*i[:2])) + j[1])
             # Display energy of foods
             print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + term.turquoise + '%d' % (i[2]))
-    
+
+    print(term.normal + term.move_xy(int(term.width/2) - int(((4 * 20)+1)/2), coordinate(0, 21)[1]) + (' ' * ((4 * width)+1)))
+
     display()
     
 
@@ -63,10 +62,10 @@ def coordinate(x, y):
     home = int(term.width/2) - int(((4 * 20)+1)/2)
     x = home+(2+(4*(x-1)))
     y = (y*2)-1
-    return x, y
+    return x, y+1
 
 def display():
-    print(term.normal + term.move_xy(int((4 * 20)+1), int((2 * 20)+1)) + ' ')
+    print(term.normal + term.move_xy(int((4 * 20)+4), int((2 * 20)+2)) + ' ')
 
 def config(file):
     config = {
@@ -100,15 +99,31 @@ def config(file):
             line = fp.readline()
     return config
 
+def get_order(player, ):
+    while not i[0] or not i[1] or not i[2]:
+        i = input(term.move_xy(*coordinate(0, 22)) + "Entrez vos ordre : ")
+        i = i.rsplit(' ')
+
+    if player == 'human':
+        print(i)
+
+    return 
+
 #dic = config('map.ano')
 
 #print(dic)
 
-board(20,20,term.gold)
+#board(20,20,term.gold)
 
 #x, y = coordinate(2,1)
 #print(term.move_xy(x, y) + term.on_normal + term.black + '\u29BB')
 
-""" for i in range(2000): 
-    print(term.red + term.move_xy(10, 20) + "%d" % i)
+""" for i in range(200): 
+    print(term.turquoise + term.on_gray25 + term.move_xy(*coordinate(*config('map.ano')['food']['deers'][1][:2])) + '%d' % (config('map.ano')['food']['deers'][1][2] - i))
     time.sleep(0.01) """
+
+""" i = 1
+while i != 'stop':
+    i = input(term.move_xy(*coordinate(0, 22)) + "Entrez vos ordre : ")
+    i = i.rsplit(' ')
+    print(term.move_xy(*coordinate(int(i[0]), int(i[1]))) + f'{i[2]}') """
