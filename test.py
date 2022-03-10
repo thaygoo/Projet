@@ -111,7 +111,7 @@ def get_order(player, ):
 
 #dic = config('map.ano')
 
-#print(dic)
+#print(dic) 
 
 #board(20,20,term.gold)
 
