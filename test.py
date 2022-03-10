@@ -113,6 +113,7 @@ def get_order(player, ):
 
 #print(dic) 
 
+
 #board(20,20,term.gold)
 
 #x, y = coordinate(2,1)
