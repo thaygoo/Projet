@@ -1,6 +1,8 @@
 import blessed
 term = blessed.Terminal()
 
+# NOTE : BONUS NE SERT QU'À L'ATTAQUE
+
 def board(width, height, color): 
     # background + cursor + clear + hide cursor + term.on_darkslategray4
     print(term.home + term.clear)
@@ -122,9 +124,3 @@ board(20,20,term.gold)
 """ for i in range(200): 
     print(term.turquoise + term.on_gray25 + term.move_xy(*coordinate(*config('map.ano')['food']['deers'][1][:2])) + '%d' % (config('map.ano')['food']['deers'][1][2] - i))
     time.sleep(0.01) """
-
-""" i = 1
-while i != 'stop':
-    i = input(term.move_xy(*coordinate(0, 22)) + "Entrez vos ordre : ")
-    i = i.rsplit(' ')
-    print(term.move_xy(*coordinate(int(i[0]), int(i[1]))) + f'{i[2]}') """

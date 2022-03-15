@@ -1,4 +1,4 @@
-def config():
+def config(): # OK
     """Read the config file and create a dictionnary with it.
 
     Return
@@ -10,7 +10,7 @@ def config():
     specification: Malo (v1 17/02/22)
     """
 
-def board():
+def board(): # OK
     """Creation of the board, place all the things on it.
 
     Return
@@ -23,7 +23,7 @@ def board():
     specification: Hugo (v1 17/02/22)
     """
 
-def nexturn():
+def nexturn(): # OK
     """Check if Alpha Wolves have enough health to continue
 
     Return
@@ -35,7 +35,7 @@ def nexturn():
     specification: Marius (v1 17/02/22)
     """
 
-def control():
+def control(): # OK 
     """Take commands of player
 
     Return
@@ -47,7 +47,7 @@ def control():
     specification: Hugo (v1 17/02/22)
     """
 
-def ai_moves():
+def ai_moves(): # OK
     """Take ai moves and send them as player control
 
     Return
@@ -59,7 +59,7 @@ def ai_moves():
     specification: Mathis (v1 17/02/22)
     """
 
-def pacification():
+def pacification(): # ok 
     """Pacification of the omega wolve
 
     Version

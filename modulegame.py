@@ -1,4 +1,3 @@
-#-*- coding: utf-8 -*-
 import blessed
 term = blessed.Terminal()
 
@@ -60,7 +59,7 @@ def coordinate(x, y):
     -------
     specification: Hugo (v1 08/03/22)
     """
-    home = int(term.width/2) - int(((4 * 20)+1)/2)
+    home = int(term.width/2) - int(((4 * int(dictionnary['map'][1]))+1)/2)
     x = home+(2+(4*(x-1)))
     y = (y*2)-1
     return x, y + 1 
@@ -94,19 +93,20 @@ def board(width, height, color):
     #centered manualy
     center = int(term.width/2) - int(((4 * width)+1)/2)
 
-    #header
-    for i in range(5, 21, 5):
+    #coordinate numbers
+    for i in range(0, int(dictionnary['map'][0])+1, 5): # X 
         print(term.normal + term.bold + term.move_xy(coordinate(i, 0)[0], 0) + color + f'{i}')
 
-    for i in range(5, 21, 5):
-        print(term.move_xy(int(term.width/2) - int(((4 * 20)+1)/2)-3, (i*2)) + f'{i}')
+    for i in range(0, int(dictionnary['map'][1])+1, 5): # Y
+        print(term.move_xy(int(term.width/2) - int(((4 * int(dictionnary['map'][0]))+1)/2)-2, (i*2)) + f'{i}')
 
+    #header
     print(term.on_gray25 + term.move_xy(center, 1) + color + '╔' + 3 * '═' + (int(width) - 1) * ('╦' + 3 * '═') + '╗', end='')
     print(term.move_xy(center, 2) + color + '║' + width * (3 * ' ' + '║'), end='')
 
     #body
     y = 3
-    for i in range(height):
+    for i in range(height-1):
         print(term.move_xy(center, i + y) + color + '╠' + (int(width) - 1) * (3 * '═' + '╬') + 3 * '═' + '╣', end='')
         y += 1
         print(term.move_xy(center, i + y) + color + '║' + width * (3 * ' ' + '║'), end='')
@@ -119,45 +119,119 @@ def board(width, height, color):
     for i in ['alpha', "α"], ['omega', "Ω"]:
         for j in [1, term.bold_red], [2, term.bold_green]:
             # display alpha and omega
-            print(term.move_xy(*coordinate(*config('map.ano')[j[0]][i[0]][:2])) + j[1] + i[1])
+            print(term.move_xy(*coordinate(*dictionnary[j[0]][i[0]][:2])) + j[1] + i[1])
             # display energy
-            print(term.move_xy((coordinate(*config('map.ano')[j[0]][i[0]][:2])[0])-1, (coordinate(*config('map.ano')[j[0]][i[0]][:2])[1])+1) + j[1] + '%d' % (config('map.ano')[j[0]][i[0]][2]))
+            print(term.move_xy((coordinate(*dictionnary[j[0]][i[0]][:2])[0])-1, (coordinate(*dictionnary[j[0]][i[0]][:2])[1])+1) + j[1] + '%d' % (dictionnary[j[0]][i[0]][2]))
 
     # Placing normal wolves:
-    for j in [1, "\u29BF", term.bold_red], [2, "\u29BF", term.bold_green]:
-        for i in config('map.ano')[j[0]]['normal']:
+    for j in [1, term.bold_red], [2, term.bold_green]:
+        for i in dictionnary[j[0]]['normal']:
             # display normal wolves
-            print(term.move_xy(*coordinate(*i[:2])) + j[2] + j[1])
+            print(term.move_xy(*coordinate(*i[:2])) + j[1] + "⦿")
             # display energy of them
-            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[2] + f'{i[2]}')
+            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[1] + f'{i[2]}')
 
     #place foods
     for j in ['berries', '\N{CHERRIES}'], ['apples', '\N{RED APPLE}'], ['mice', '\N{RAT}'], ['rabbits', '\N{RABBIT FACE}'], ['deers', '\N{OX}']: 
-        for i in config('map.ano')['food'][j[0]]:
+        for i in dictionnary['food'][j[0]]:
             # Display foods
             print(term.move_xy(*coordinate(*i[:2])) + j[1])
             # Display energy of foods
             print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + term.turquoise + f'{i[2]}')
-
-    print(term.normal + term.move_xy(int(term.width/2) - int(((4 * 20)+1)/2), coordinate(0, 21)[1]) + (' ' * ((4 * width)+1)))
     
     display()
 
+def get_human_orders(player):
+    """Creation of the board, place all the things on it.
+
+    Parameters
+    ----------
+    player (int) : player 1 or 2
+
+    Version
+    -------
+    specification: Hugo (v1 10/03/22)
+
+    Return
+    ------
+    orders (list) : Return the orders on a list
+
+    Examples
+    --------
+    12-12:*12-13 12-14:*12-13 10-10:pacify
+    """
+    orders = []
+    p = input(term.move_xy(*coordinate(0, 22)) + "Joueur %d, entrez vos ordres: " % player)
+
+    for i in range(len(p.rsplit(" "))):
+        orders.append(p.rsplit(" ")[i])
+
+    return orders
+
+def nexturn():
+    """Check if Alpha Wolves have enough health to continue
+
+    Return
+    ------
+
+    Version
+    -------
+    specification: Marius (v1 17/02/22)
+    """
+    if dictionnary[1]["alpha"][2] <= 0 or dictionnary[2]["alpha"][2] <=0:
+        return False
+    else:
+        return True
+
+def pacify():
+    """Pacification of the omega wolve
+
+    Parameters
+    ----------
+
+
+    Version
+    -------
+    specification: Hugo (v2 28/02/22)
+    """
+    
+    
+
+    return
+
+def bonus():
+    """Manage bonuses
+
+    Version
+    -------
+    specification: Mathis (v1 17/02/22)
+    """
+    
+    return
+
+def bonus():
+    """Manage bonus
+
+    Version
+    -------
+    specification: Mathis (v1 17/02/22)
+    """
 
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-board(20, 20, term.gold)
+dictionnary = config('map.ano')
+board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+pacify()
 
 
 # main function
-def play_game(map_path, group_1, type_1, group_2, type_2):
+def play_game(group_1, type_1, group_2, type_2, configfile):
     """Play a game.
     
     Parameters
     ----------
-    map_path: path of map file (str)
+    configfile: path of the config file.
     group_1: group of player 1 (int)
     type_1: type of player 1 (str)
     group_2: group of player 2 (int)
