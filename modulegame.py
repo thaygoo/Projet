@@ -184,30 +184,6 @@ def nexturn():
     else:
         return True
 
-def pacify(order):
-    """Pacification of the omega wolve
-
-    Parameters
-    ----------
-
-
-    Version
-    -------
-    specification: Hugo (v2 28/02/22)
-    """
-    #Tous les loups du plateau à condition qu'ils se trouvent à 6 cases de distance, cout de la chose, 40 énergy pour pacifier un tour.
-    return
-
-def bonus():
-    """Manage bonuses
-
-    Version
-    -------
-    specification: Mathis (v1 17/02/22)
-    """
-    
-    return
-
 def find(coos):
     for y in [0, 1]: 
         for i in ['alpha', 'omega']:
@@ -247,13 +223,81 @@ def move(orders, team): #3-3:@4-3
                 print ("Error: you cannot go there")
     board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+def distance(pos1, pos2): # UNDER DEVELOPPEMENT
+    """Calculate the distance between two different object.
+
+    Parameters
+    ----------
+    pos1, pos2 (list) : Positions of the objects
+
+    Version
+    -------
+    specification: Mathis (v1 17/02/22)
+
+    1(r1, c1) 2(r2, c2)   (r2 - r1) , (c2 - c1)
+
+    """
+
+    pos1 = pos1.split('-')
+
+    return [(pos2[0] - pos1[0]), (pos2[1] - pos1[1])]
+
+def pacify(order):
+    """Pacification of the omega wolve
+
+    Parameters
+    ----------
+
+
+    Version
+    -------
+    specification: Hugo (v2 28/02/22)
+    """
+    #Tous les loups du plateau à condition qu'ils se trouvent à 6 cases de distance, cout de la chose, 40 énergy pour pacifier un tour.
+
+
+
+    return
+
+def bonus():
+    """Manage bonuses
+
+    Version
+    -------
+    specification: Mathis (v1 17/02/22)
+    """
+    
+    return
+
+def feeding():
+    """Manage bonuses
+
+    Version
+    -------
+    specification: Mathis (v1 17/02/22)
+    """
+    
+    return
+
+def fighting():
+    """Manage bonuses
+
+    Version
+    -------
+    specification: Mathis (v1 17/02/22)
+    """
+
+    return
+
+#---------------------------------------------------------------------------------------------------------------------------------
 
 print(term.home + term.clear)
 
 dictionnary = config('map.ano')
 
-board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+#board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+
+print(distance([5, 5], [2, 2]))
 
 """ 
 orders = get_human_orders(1)
