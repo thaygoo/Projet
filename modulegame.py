@@ -17,7 +17,8 @@ def config(file):
         1:{'alpha': '', 'omega': '', 'normal': []}, 
         2:{'alpha': '', 'omega': '', 'normal': []}, 
         "food":{'berries': [], 'apples': [], 'mice': [], 'rabbits': [], 'deers': []}, 
-        'map':()
+        'map':(),
+        'pacify': []
     }
 
     with open(file) as fp:
@@ -60,9 +61,9 @@ def coordinate(x, y):
     specification: Hugo (v1 08/03/22)
     """
     home = int(term.width/2) - int(((4 * int(dictionnary['map'][1]))+1)/2)
-    x = home+(2+(4*(x-1)))
-    y = (y*2)-1
-    return x, y + 1 
+    x = home+(2+(4*(int(x)-1)))
+    y = (int(y)*2)-1
+    return int(x), int(y) + 1 
 
 def display():
     """Deals a problem encounter while displaying the final board.
@@ -88,7 +89,7 @@ def board(width, height, color):
     """
 
     # background + cursor + clear + hide cursor + term.on_darkslategray4
-    print(term.home + term.clear)
+    print(term.home)
 
     #centered manualy
     center = int(term.width/2) - int(((4 * width)+1)/2)
@@ -115,6 +116,14 @@ def board(width, height, color):
     print(term.move_xy(center, (height*2)+1) + color + '╚' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╝', end='')
 
     #placing objects
+    #place foods
+    for j in ['berries', '\N{CHERRIES}'], ['apples', '\N{RED APPLE}'], ['mice', '\N{RAT}'], ['rabbits', '\N{RABBIT FACE}'], ['deers', '\N{OX}']: 
+        for i in dictionnary['food'][j[0]]:
+            # Display foods
+            print(term.move_xy(*coordinate(*i[:2])) + j[1])
+            # Display energy of foods
+            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + term.turquoise + f'{i[2]}')
+
     #Placing Alphas :
     for i in ['alpha', "α"], ['omega', "Ω"]:
         for j in [1, term.bold_red], [2, term.bold_green]:
@@ -130,14 +139,6 @@ def board(width, height, color):
             print(term.move_xy(*coordinate(*i[:2])) + j[1] + "⦿")
             # display energy of them
             print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[1] + f'{i[2]}')
-
-    #place foods
-    for j in ['berries', '\N{CHERRIES}'], ['apples', '\N{RED APPLE}'], ['mice', '\N{RAT}'], ['rabbits', '\N{RABBIT FACE}'], ['deers', '\N{OX}']: 
-        for i in dictionnary['food'][j[0]]:
-            # Display foods
-            print(term.move_xy(*coordinate(*i[:2])) + j[1])
-            # Display energy of foods
-            print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + term.turquoise + f'{i[2]}')
     
     display()
 
@@ -158,7 +159,7 @@ def get_human_orders(player):
 
     Examples
     --------
-    12-12:*12-13 12-14:*12-13 10-10:pacify
+    12-12:@12-13 12-14:*12-13 10-10:pacify
     """
     orders = []
     p = input(term.move_xy(*coordinate(0, 22)) + "Joueur %d, entrez vos ordres: " % player)
@@ -183,7 +184,7 @@ def nexturn():
     else:
         return True
 
-def pacify():
+def pacify(order):
     """Pacification of the omega wolve
 
     Parameters
@@ -194,9 +195,7 @@ def pacify():
     -------
     specification: Hugo (v2 28/02/22)
     """
-    
-    
-
+    #Tous les loups du plateau à condition qu'ils se trouvent à 6 cases de distance, cout de la chose, 40 énergy pour pacifier un tour.
     return
 
 def bonus():
@@ -209,20 +208,57 @@ def bonus():
     
     return
 
-def bonus():
-    """Manage bonus
+def find(coos):
+    for y in [0, 1]: 
+        for i in ['alpha', 'omega']:
+            for j in [1, 2]:
+                if dictionnary[j][i][0] == int(coos[0]) and dictionnary[j][i][1] == int(coos[1]):
+                    return [j, i]
 
-    Version
-    -------
-    specification: Mathis (v1 17/02/22)
-    """
+        for j in [1, 2]:
+            for i in range(len(dictionnary[j]['normal'])):
+                if dictionnary[j]['normal'][i][0] == int(coos[0]) and dictionnary[j]['normal'][i][1] == int(coos[1]):
+                    return [j, 'normal', i]
 
+def move(orders, team): #3-3:@4-3
+    for order in orders:
+        if '@' in order:
+        #Filters moving orders
+            order=order.rsplit(':@')
+            for i in range(2):
+                order[i] = order[i].split('-')
+            
+            if int(order[0][1])-int(order[1][1]) in [-1,0,1] and int(order[0][0])-int(order[1][0]) in [-1,0,1]:
+                if 0<int(order[1][0])<21 and 0<int(order[1][1])<21:
+                #Checks if the final position isn't too far
+                    
+                    index = find(order[0])
+                    if index[0] == team:
+                        if len(index) > 2:
+                            dictionnary[index[0]][index[1]][index[2]][:2] = order[1]
+                        else:
+                            dictionnary[index[0]][index[1]][:2] = order[1]
+                    else:
+                        print ("Error: Please be sure to use the good wolves")
+                #Moving to new coordinates
+                else:
+                    print ("Error: Out of bounds")
+            else:
+                print ("Error: you cannot go there")
+    board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+print(term.home + term.clear)
+
 dictionnary = config('map.ano')
+
 board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
-pacify()
+
+""" 
+orders = get_human_orders(1)
+move(orders, 1) """
+
 
 
 # main function
