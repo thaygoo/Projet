@@ -242,7 +242,7 @@ def distance(pos1, pos2): # UNDER DEVELOPPEMENT
 
     return [(pos2[0] - pos1[0]), (pos2[1] - pos1[1])]
 
-def pacify(order): # 10-10:pacify
+def pacify(order): 
     """Pacification of the omega wolve
 
     Parameters
@@ -253,7 +253,6 @@ def pacify(order): # 10-10:pacify
     -------
     specification: Hugo (v2 17/03/22)
     """
-    #Tous les loups du plateau à condition qu'ils se trouvent à 6 cases de distance, cout de la chose, 40énergy pour pacifier un tour.
 
     pacified = []
 
