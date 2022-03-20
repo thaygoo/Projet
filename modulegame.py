@@ -242,22 +242,33 @@ def distance(pos1, pos2): # UNDER DEVELOPPEMENT
 
     return [(pos2[0] - pos1[0]), (pos2[1] - pos1[1])]
 
-def pacify(order):
+def pacify(order): # 10-10:pacify
     """Pacification of the omega wolve
 
     Parameters
     ----------
-
+    order (str) : order for the wolves.
 
     Version
     -------
-    specification: Hugo (v2 28/02/22)
+    specification: Hugo (v2 17/03/22)
     """
-    #Tous les loups du plateau à condition qu'ils se trouvent à 6 cases de distance, cout de la chose, 40 énergy pour pacifier un tour.
+    #Tous les loups du plateau à condition qu'ils se trouvent à 6 cases de distance, cout de la chose, 40énergy pour pacifier un tour.
 
+    pacified = []
 
+    order = order.split(':')[0]
+    order = order.split('-')
+    
+    for i in range (-3, 4):
+        for j in range(-3, 4):
+            x = i+int(order[0])
+            y = j+int(order[1])
+            if 0 < x < int(dictionnary['map'][0])+1 and 0 < y < int(dictionnary['map'][1])+1:
+                if find([x, y]):
+                    pacified.append([x, y])
 
-    return
+    return pacified
 
 def bonus():
     """Manage bonuses
@@ -289,7 +300,7 @@ def fighting():
 
     return
 
-#---------------------------------------------------------------------------------------------------------------------------------
+#   ---------------------------------------------------------------------------------------------------------------------------------
 
 print(term.home + term.clear)
 
@@ -297,7 +308,8 @@ dictionnary = config('map.ano')
 
 #board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
-print(distance([5, 5], [2, 2]))
+print(pacify("1-5:pacify"))
+display()
 
 """ 
 orders = get_human_orders(1)
