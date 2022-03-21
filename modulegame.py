@@ -185,16 +185,25 @@ def nexturn():
         return True
 
 def find(coos):
-    for y in [0, 1]: 
-        for i in ['alpha', 'omega']:
-            for j in [1, 2]:
-                if dictionnary[j][i][0] == int(coos[0]) and dictionnary[j][i][1] == int(coos[1]):
-                    return [j, i]
+    """ Pacification of the omega wolve
 
+    Parameters
+    ----------
+    order (str) : order for the wolves.
+
+    Version
+    -------
+    specification: Hugo (v2 17/03/22) """
+    
+    for i in ['alpha', 'omega']:
         for j in [1, 2]:
-            for i in range(len(dictionnary[j]['normal'])):
-                if dictionnary[j]['normal'][i][0] == int(coos[0]) and dictionnary[j]['normal'][i][1] == int(coos[1]):
-                    return [j, 'normal', i]
+            if dictionnary[j][i][0] == int(coos[0]) and dictionnary[j][i][1] == int(coos[1]):
+                return [j, i, dictionnary[j][i][2]]
+
+    for j in [1, 2]:
+        for i in range(len(dictionnary[j]['normal'])):
+            if dictionnary[j]['normal'][i][0] == int(coos[0]) and dictionnary[j]['normal'][i][1] == int(coos[1]):
+                return [j, 'normal', i, dictionnary[j]['normal'][i][2]]
 
 def move(orders, team): #3-3:@4-3
     for order in orders:
@@ -242,7 +251,7 @@ def distance(pos1, pos2): # UNDER DEVELOPPEMENT
 
     return [(pos2[0] - pos1[0]), (pos2[1] - pos1[1])]
 
-def pacify(order): 
+def pacify(order, team): # pacify(1-1:pacify, 1)
     """Pacification of the omega wolve
 
     Parameters
@@ -253,21 +262,28 @@ def pacify(order):
     -------
     specification: Hugo (v2 17/03/22)
     """
-
     pacified = []
 
+    #split the order
     order = order.split(':')[0]
     order = order.split('-')
     
-    for i in range (-3, 4):
-        for j in range(-3, 4):
-            x = i+int(order[0])
-            y = j+int(order[1])
-            if 0 < x < int(dictionnary['map'][0])+1 and 0 < y < int(dictionnary['map'][1])+1:
-                if find([x, y]):
-                    pacified.append([x, y])
+    # check if its really an omega and good team
+    if find(order)[1] == 'omega' and int(find(order)[0]) == team and int(find(order)[2]) >= 40 :
+        #remove 40 energy to the omega
+        dictionnary[team]['omega'][2] -= 40
+        #loop for the tchebitchev distance
+        for i in range (-6, 7):
+            for j in range(-6, 7):
+                x = i+int(order[0])
+                y = j+int(order[1])
+                if 0 < x < int(dictionnary['map'][0])+1 and 0 < y < int(dictionnary['map'][1])+1:
+                    if find([x, y]):
+                        pacified.append([x, y])
 
-    return pacified
+        return pacified
+    else:
+        return "ValueError : Please check that you are using an omega and/ or the good team"
 
 def bonus():
     """Manage bonuses
@@ -276,7 +292,9 @@ def bonus():
     -------
     specification: Mathis (v1 17/02/22)
     """
-    
+
+
+
     return
 
 def feeding():
@@ -286,7 +304,7 @@ def feeding():
     -------
     specification: Mathis (v1 17/02/22)
     """
-    
+
     return
 
 def fighting():
@@ -307,13 +325,12 @@ dictionnary = config('map.ano')
 
 #board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
-print(pacify("1-5:pacify"))
-display()
+print(find([2,2]))
 
 """ 
 orders = get_human_orders(1)
-move(orders, 1) """
-
+move(orders, 1) 
+"""
 
 
 # main function
