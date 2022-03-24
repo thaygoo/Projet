@@ -293,8 +293,6 @@ def bonus():
     specification: Mathis (v1 17/02/22)
     """
 
-
-
     return
 
 def feeding():
@@ -323,7 +321,7 @@ print(term.home + term.clear)
 
 dictionnary = config('map.ano')
 
-#board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
 print(find([2,2]))
 
