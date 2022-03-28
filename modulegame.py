@@ -19,7 +19,9 @@ def config(file):
         "food":{'berries': [], 'apples': [], 'mice': [], 'rabbits': [], 'deers': []}, 
         'map':(),
         'pacify': [],
-        'wolfplayed': []
+        'wolfplayed': [],
+        'saved_energy': {},
+        'rounds': 0 
     }
 
     with open(file) as fp:
@@ -153,6 +155,9 @@ def board(width, height, color):
                 # display energy of them
                 print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[1] + f'{i[2]}')
 
+    # Rounds
+    print(term.normal + term.move_xy(coordinate(1, 0)[0], 2+(2*int(dictionnary['map'][1]))) + term.bold + color + "Rounds %d " % dictionnary['rounds'])
+
 def get_human_orders(player):
     """Creation of the board, place all the things on it.
 
@@ -178,7 +183,7 @@ def get_human_orders(player):
         'fight' : [],
         'move' : []
     }
-    p = input(term.normal + term.move_xy(coordinate(0, 0)[0], 3+(2*int(dictionnary['map'][1]))) + "Player %d : " % player)
+    p = input(term.normal + term.move_xy(coordinate(0, 0)[0], 5+(2*int(dictionnary['map'][1]))) + "Player %d : " % player)
 
     for i in range(len(p.rsplit(" "))):
         if 'pacify' in p.rsplit(" ")[i]:
@@ -202,10 +207,14 @@ def nexturn():
     -------
     specification: Marius (v1 17/02/22)
     """
-    if dictionnary[1]["alpha"][2] <= 0 or dictionnary[2]["alpha"][2] <=0:
-        return False
+    if dictionnary[1]["alpha"][2] <= 0 and dictionnary[2]["alpha"][2] <=0: # both lose
+        return 1
+    elif dictionnary[1]["alpha"][2] <=0: # player 1 lose
+        return 2
+    elif dictionnary[2]["alpha"][2] <=0: # player 2 lose
+        return 3
     else:
-        return True
+        return 0 # no loser
 
 def find(coos):
     """ Pacification of the omega wolve
@@ -240,20 +249,20 @@ def findattack(coos):
     Version
     -------
     specification: Hugo (v2 17/03/22) """
-    if 0 < int(coos[0]) < int(dictionnary['map'][0]) and 0 < int(coos[1]) < int(dictionnary['map'][1]):
+    if 0 < int(coos[0]) < int(dictionnary['map'][0])+1 and 0 < int(coos[1]) < int(dictionnary['map'][1])+1:
         for i in ['alpha', 'omega']:
             for j in [1, 2]:
-                if attackdic[j][i][0] == int(coos[0]) and attackdic[j][i][1] == int(coos[1]):
-                    return [j, i, attackdic[j][i][2], attackdic[j][i][3]]
+                if dictionnary['saved_energy'][j][i][0] == int(coos[0]) and dictionnary['saved_energy'][j][i][1] == int(coos[1]):
+                    return [j, i, dictionnary['saved_energy'][j][i][2], dictionnary['saved_energy'][j][i][3]]
 
         for j in [1, 2]:
-            for i in range(len(attackdic[j]['normal'])):
-                if attackdic[j]['normal'][i][0] == int(coos[0]) and attackdic[j]['normal'][i][1] == int(coos[1]):
-                    return [j, 'normal', attackdic[j]['normal'][i][2], attackdic[j]['normal'][i][3], i]
+            for i in range(len(dictionnary['saved_energy'][j]['normal'])):
+                if dictionnary['saved_energy'][j]['normal'][i][0] == int(coos[0]) and dictionnary['saved_energy'][j]['normal'][i][1] == int(coos[1]):
+                    return [j, 'normal', dictionnary['saved_energy'][j]['normal'][i][2], dictionnary['saved_energy'][j]['normal'][i][3], i]
     else:
         return "ValueError: Not in the bounds"
 
-def move(order, team): #3-3:@4-3  NE PAS ALLER SUR UNE CASE OCCUPée
+def move(order, team): 
     order=order.rsplit(':@')
     for i in range(2):
         order[i] = order[i].split('-')
@@ -262,29 +271,32 @@ def move(order, team): #3-3:@4-3  NE PAS ALLER SUR UNE CASE OCCUPée
         for j in range(0,2):
             order[i][j] = int(order[i][j])
     
-    if order[0] not in dictionnary['wolfplayed']:
-        if int(order[0][1]) - int(order[1][1]) in [-1,0,1] and int(order[0][0]) - int(order[1][0]) in [-1,0,1]:
-            if 0 < int(order[1][0]) < int(dictionnary['map'][0]) + 1 and 0 < int(order[1][1]) < int(dictionnary['map'][1]) + 1:
-            #Checks if the final position isn't too far
-                index = find(order[0])
-                if index[0] == team:
-                    if len(index) > 4:
-                        dictionnary[index[0]][index[1]][index[4]][:2] = order[1]
+    if not find(order[1]):
+        if order[0] not in dictionnary['wolfplayed'] :
+            if int(order[0][1]) - int(order[1][1]) in [-1,0,1] and int(order[0][0]) - int(order[1][0]) in [-1,0,1]:
+                if 0 < int(order[1][0]) < int(dictionnary['map'][0]) + 1 and 0 < int(order[1][1]) < int(dictionnary['map'][1]) + 1:
+                #Checks if the final position isn't too far
+                    index = find(order[0])
+                    if index[0] == team:
+                        if len(index) > 4:
+                            dictionnary[index[0]][index[1]][index[4]][:2] = order[1]
+                        else:
+                            dictionnary[index[0]][index[1]][:2] = order[1]
                     else:
-                        dictionnary[index[0]][index[1]][:2] = order[1]
+                        return "Error: Please be sure to use the good wolves."
                 else:
-                    return ("Error: Please be sure to use the good wolves.")
+                    return "Error: Out of bounds."
             else:
-                return ("Error: Out of bounds.")
+                return "Error: you cannot go there."
         else:
-            return ("Error: you cannot go there.") 
+                return "Error: This wolves already played."
     else:
-            return ("Error: This wolves already played.") 
+        return "ValueError: Ther is already a wolf on this case."
 
     dictionnary['wolfplayed'].append(order[1])
     board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
-def pacify(order, team): # pacify(1-1:pacify, 1)
+def pacify(order, team):
     """Pacification of the omega wolve
 
     Parameters
@@ -379,7 +391,7 @@ def findfood(coos):
                 #return le type de food et sa valeur nutritionelle
                 return [j,i,dictionnary['food'][i][j][2]]
 
-def feeding(order, team): #3-3:<4-3
+def feeding(order, team):
     """Manage bonuses
 
     Version
@@ -422,7 +434,7 @@ def feeding(order, team): #3-3:<4-3
     dictionnary['wolfplayed'].append(order[0])
     board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
-def fighting(order): #3-3:*4-3
+def fighting(order): 
     """Manage bonuses
 
     Version
@@ -460,21 +472,6 @@ def fighting(order): #3-3:*4-3
         return 'ValueError: Please check that both of the wolves exists.' 
     dictionnary['wolfplayed'].append(order[0])
 
-#   ---------------------------------------------------------------------------------------------------------------------------------
-# TASKS :
-# ARE WOLF HAVE PLAYED THIS ROUND YET ? 
-# Je pense le mettre avant d'apliquer les ordres pour qu'il soit extérieur aux fonctions
-# COUNT OF ROUND important ça
-# histoire des 200 tours consécutifs tied
-# Verifier que les deux alphas ne meurent pas au même tour
-# Spécifications
-# vidéo
-# rapport
-
-dictionnary = config('map10.ano')
-attackdic = []
-
-# main function
 def play_game(group_1, type_1, group_2, type_2):
     """Play a game.
     
@@ -495,10 +492,10 @@ def play_game(group_1, type_1, group_2, type_2):
     8-9:@7-9 9-9:*9-10 9-8:@9-7 8-8:<7-7
     """
 
-    while nexturn():
+    while nexturn() == 0:
         print(term.home + term.clear)
         bonus()
-        attackdic = dictionnary.copy() # per round
+        dictionnary['saved_energy'] = dictionnary.copy() # per round
         dictionnary['pacify'] = [] # per round
         dictionnary['wolfplayed'] = []
         orders= []
@@ -512,7 +509,7 @@ def play_game(group_1, type_1, group_2, type_2):
                 board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
         for i in range(0,2):
-            """ # First step : Pacify
+            # First step : Pacify
             if orders[i]['pacify']:
                 pacify(orders[i]['pacify'][0], (i+1))
 
@@ -522,13 +519,20 @@ def play_game(group_1, type_1, group_2, type_2):
 
             # Third step : Fight
             for j in orders[i]['fight']:
-                fighting(j) """
+                fighting(j)
 
             # Fourth step : Move
             for j in orders[i]['move']:
                     move(j, (i +1))
-        print(dictionnary['wolfplayed'])
-        time.sleep(5)
 
+        
+        dictionnary['rounds'] += 1
+        #time.sleep(0.5)
 
+dictionnary = config('map10.ano')
 play_game(1, 'human', 2, 'human')
+
+# histoire des 200 tours consécutifs tied
+# Verifier que les deux alphas ne meurent pas au même tour
+# vidéo
+# rapport
