@@ -98,13 +98,18 @@ def config(file):
 
 #print(dic)
 
-board(20,20,term.gold)
+#board(20,20,term.gold)
 
 #x, y = coordinate(2,1)
 #print(term.move_xy(x, y) + term.on_normal + term.black + '\u29BB')
 
-print(term.red + term.move_xy(100, 45) + '')
+#print(term.red + term.move_xy(100, 45) + '')
 
 """ for i in range(2000): 
     print(term.red + term.move_xy(10, 20) + "%d" % i)
     time.sleep(0.01) """
+
+
+
+pacify = [[2, 2], [3, 3]]
+
