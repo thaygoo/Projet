@@ -1,9 +1,6 @@
 import blessed, time
 from random import *
 
-from urllib3 import Retry
-term = blessed.Terminal()
-
 # other functions
 def config(file):
     """Get the data from the config file and create a dictionnary with it.
@@ -467,11 +464,11 @@ def feeding(order, team):
                         dictionnary[team][index[1]][2] = 100
                     else: # food not enought to heal max energy
                         #dictionnary[team][index[1]][2] += dictionnary['food'][foodindex[1]][foodindex[0]][2]
-                        dictionnary['food'][foodindex[1]][foodindex[0]] = 0
+                        dictionnary['food'][foodindex[1]][foodindex[0]][2] = 0
 
                 board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
                 print('%d    ' % dictionnary['food'][foodindex[1]][foodindex[0]][2])
-                #u = input('')
+                u = input('')
             else:
                 return "ValueError : Please check that the food really exist or isn't empty."
         else:
@@ -694,5 +691,5 @@ def play_game(group_1, type_1, group_2, type_2):
     print(nexturn())
         
 print(term.home + term.clear)
-dictionnary = config('map10.ano')
+dictionnary = config('map.ano')
 play_game(1, 'AI', 2, 'AI')
