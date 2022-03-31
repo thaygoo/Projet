@@ -9,8 +9,6 @@ Author: Benoit Frenay (benoit.frenay@unamur.be).
 
 """
 
-
-
 import socket
 import time
 
