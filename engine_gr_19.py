@@ -1,7 +1,8 @@
-import blessed, time
+import blessed, time, math, ai_dumb_gr_19, ai_engine_gr_19
 from random import *
 
-# other functions
+term = blessed.Terminal()
+
 def config(file):
     """Get the data from the config file and create a dictionnary with it.
 
@@ -21,6 +22,7 @@ def config(file):
         'pacify': [],
         'wolfplayed': [],
         'saved_energy': {},
+        'stats': { 'healths': [0, 0]},
         'rounds': [0, False, 0] 
     }
 
@@ -63,8 +65,9 @@ def coordinate(x, y):
     -------
     specification: Mathis - Malo (v2 08/03/22)
     """
-    home = int(term.width/2) - int(((4 * int(dictionnary['map'][1]))+1)/2)
-    x = home+(2+(4*(int(x)-1)))
+    homex = int(term.width/2) - int(((4 * int(dictionnary['map'][1]))+1)/2)
+
+    x = homex+(2+(4*(int(x)-1)))
     y = (int(y)*2)-1
     return int(x), int(y) + 1 
 
@@ -149,6 +152,10 @@ def board(width, height, color):
     # Rounds
     print(term.normal + term.move_xy(coordinate(1, 0)[0], 2+(2*int(dictionnary['map'][1]))) + term.bold + color + "Rounds %d " % dictionnary['rounds'][0])
 
+    # Healths
+    print(term.normal + term.move_xy(coordinate(1, 0)[0], 3+(2*int(dictionnary['map'][1]))) + term.bold_red + progress((dictionnary[1]['alpha'][2]/100), 50))
+    print(term.normal + term.move_xy(coordinate(1, 0)[0], 4+(2*int(dictionnary['map'][1]))) + term.bold_green + progress((dictionnary[2]['alpha'][2]/100), 50))
+
 def get_human_orders(player):
     """Input asking for human orders using a specific format and associate orders with adequate function
     Input model :
@@ -206,15 +213,22 @@ def nexturn():
     specification: Marius (v1 17/02/22)
     """
     if dictionnary[1]["alpha"][2] <= 0 and dictionnary[2]["alpha"][2] <=0: # both lose
-        return "Equality ! Both of the alphas are dead."
-    elif dictionnary[1]["alpha"][2] <=0: # player 1 lose
+        return "Tie ! Both of the alphas are dead."
+    elif dictionnary[1]["alpha"][2] <= 0: # player 1 lose
         return "Well play ! Player 2 win !"
-    elif dictionnary[2]["alpha"][2] <=0: # player 2 lose
+    elif dictionnary[2]["alpha"][2] <= 0: # player 2 lose
         return "Well play ! Player 1 win !"
+    elif dictionnary['rounds'][2] > 200:
+        if dictionnary['rounds'][0] > dictionnary['rounds'][2]:
+            return "Player 1 win ! His total was %d, player 2 was %d" % (dictionnary['rounds'][0], dictionnary['rounds'][2])
+        elif dictionnary['rounds'][2] > dictionnary['rounds'][0]:
+            return "Player 2 win ! His total was %d, player 1 was %d" % (dictionnary['rounds'][0], dictionnary['rounds'][2])
+        else:
+            return "Both of the player has the same amount of live ! Player 1 was %d, player 2 was %d" % (dictionnary['rounds'][0], dictionnary['rounds'][2])
     else:
-        return 0 # no loser
+        return 0
 
-def find(coos):
+def find(dictionnary, coos):
     """ Returns a list stats of a wolf according to its position
 
     Parameters
@@ -243,19 +257,6 @@ def find(coos):
             if dictionnary[j]['normal'][i][0] == int(coos[0]) and dictionnary[j]['normal'][i][1] == int(coos[1]):
                 return [j, 'normal', dictionnary[j]['normal'][i][2], dictionnary[j]['normal'][i][3], i]
 
-def findattack(coos):
-    """ Same as find() but in another dictionnary
-    """
-    for i in ['alpha', 'omega']:
-        for j in [1, 2]:
-            if dictionnary['saved_energy'][j][i][0] == int(coos[0]) and dictionnary['saved_energy'][j][i][1] == int(coos[1]):
-                return [j, i, dictionnary['saved_energy'][j][i][2], dictionnary['saved_energy'][j][i][3]]
-
-    for j in [1, 2]:
-        for i in range(len(dictionnary['saved_energy'][j]['normal'])):
-            if dictionnary['saved_energy'][j]['normal'][i][0] == int(coos[0]) and dictionnary['saved_energy'][j]['normal'][i][1] == int(coos[1]):
-                return [j, 'normal', dictionnary['saved_energy'][j]['normal'][i][2], dictionnary['saved_energy'][j]['normal'][i][3], i]
-
 def move(order, team): 
     """ Moves wolf to asked coordinates
 
@@ -283,13 +284,13 @@ def move(order, team):
         for j in range(0,2):
             order[i][j] = int(order[i][j])
     
-    if not find(order[1]):
-        if find(order[0]):
+    if not find(dictionnary, order[1]):
+        if find(dictionnary, order[0]):
             if order[0] not in dictionnary['wolfplayed'] :
                 if int(order[0][1]) - int(order[1][1]) in [-1,0,1] and int(order[0][0]) - int(order[1][0]) in [-1,0,1]:
                     if 0 < int(order[1][0]) < int(dictionnary['map'][0]) + 1 and 0 < int(order[1][1]) < int(dictionnary['map'][1]) + 1:
                     #Checks if the final position isn't too far
-                        index = find(order[0])
+                        index = find(dictionnary, order[0])
                         if index[0] == team:
                             if len(index) > 4:
                                 dictionnary[index[0]][index[1]][index[4]][:2] = order[1]
@@ -334,9 +335,9 @@ def pacify(order, team):
     order = order.split(':')[0]
     order = order.split('-')
     
-    if find(order):
+    if find(dictionnary, order):
         # check if its really an omega and good team
-        if find(order)[1] == 'omega' and int(find(order)[0]) == team and int(find(order)[2]) >= 40 :
+        if find(dictionnary, order)[1] == 'omega' and int(find(dictionnary, order)[0]) == team and int(find(dictionnary, order)[2]) >= 40 :
             #remove 40 energy to the omega
             dictionnary[team]['omega'][2] -= 40
             #loop for the tchebitchev distance
@@ -345,7 +346,7 @@ def pacify(order, team):
                     x = i+int(order[0])
                     y = j+int(order[1])
                     if 0 < x < int(dictionnary['map'][0])+1 and 0 < y < int(dictionnary['map'][1])+1:
-                        if find([x, y]):
+                        if find(dictionnary, [x, y]):
                             dictionnary["pacify"].append([x,y])
         else:
             return "ValueError : Please check that you are using an omega and/ or the good team"
@@ -444,31 +445,26 @@ def feeding(order, team):
         for j in range(0,2):
             order[i][j] = int(order[i][j])
 
-    if find(order[0]) and int(find(order[0])[0]) == team and int(find(order[0])[2]) < 100 : #check good team and not full life
+    if find(dictionnary, order[0]) and int(find(dictionnary, order[0])[0]) == team and int(find(dictionnary, order[0])[2]) < 100 : #check good team and not full life
         if int(order[0][1]) - int(order[1][1]) in [-1,0,1] and int(order[0][0]) - int(order[1][0]) in [-1,0,1]: # check distance
             if findfood(order[1]) and findfood(order[1])[2] > 0: # check that food exist
-                index = find(order[0])
+                index = find(dictionnary, order[0])
                 foodindex = findfood(order[1])
-                print(index)
-                print(foodindex)
                 if len(index) > 4: # check if normal wolves
                     if (dictionnary[team][index[1]][index[4]][2] + dictionnary['food'][foodindex[1]][foodindex[0]][2]) >= 100: # is food bigger than the energy required ?
-                        #dictionnary['food'][foodindex[1]][foodindex[0]][2] = dictionnary['food'][foodindex[1]][foodindex[0]][2] - (dictionnary['food'][foodindex[1]][foodindex[0]][2] + dictionnary[team][index[1]][index[4]][2]) - 100
+                        dictionnary['food'][foodindex[1]][foodindex[0]][2] -= 100 - dictionnary[team][index[1]][index[4]][2]
                         dictionnary[team][index[1]][index[4]][2] = 100
                     else: # food not enought to heal max energy
-                        #dictionnary[team][index[1]][index[4]][2] += dictionnary['food'][foodindex[1]][foodindex[0]][2]
+                        dictionnary[team][index[1]][index[4]][2] += dictionnary['food'][foodindex[1]][foodindex[0]][2]
                         dictionnary['food'][foodindex[1]][foodindex[0]][2] = 0
                 else: # alpha or omega
                     if (dictionnary[team][index[1]][2] + dictionnary['food'][foodindex[1]][foodindex[0]][2]) >= 100: # is food bigger than the energy required ?
-                        #dictionnary['food'][foodindex[1]][foodindex[0]][2] = dictionnary['food'][foodindex[1]][foodindex[0]][2] - (dictionnary['food'][foodindex[1]][foodindex[0]][2] + dictionnary[team][index[1]][2]) - 100
+                        dictionnary['food'][foodindex[1]][foodindex[0]][2] -= 100 - dictionnary[team][index[1]][2]
                         dictionnary[team][index[1]][2] = 100
                     else: # food not enought to heal max energy
-                        #dictionnary[team][index[1]][2] += dictionnary['food'][foodindex[1]][foodindex[0]][2]
+                        dictionnary[team][index[1]][2] += dictionnary['food'][foodindex[1]][foodindex[0]][2]
                         dictionnary['food'][foodindex[1]][foodindex[0]][2] = 0
 
-                board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
-                print('%d    ' % dictionnary['food'][foodindex[1]][foodindex[0]][2])
-                u = input('')
             else:
                 return "ValueError : Please check that the food really exist or isn't empty."
         else:
@@ -508,17 +504,17 @@ def fighting(order):
             order[i][j] = int(order[i][j])
 
 
-    if find(order[0]) and find(order[1]): # are both of wolves exists ?
+    if find(dictionnary, order[0]) and find(dictionnary, order[1]): # are both of wolves exists ?
         if int(order[0][1]) - int(order[1][1]) in [-1,0,1] and int(order[0][0]) - int(order[1][0]) in [-1,0,1]: # check distance
             if order[0] not in dictionnary['pacify']: # 1st pacified ?
-                if find(order[0])[2] > 0 and find(order[1])[2] > 0: # Are wolves humans ??
-                    index = find(order[1])
+                if find(dictionnary, order[0])[2] > 0 and find(dictionnary, order[1])[2] > 0: # Are wolves humans ??
+                    index = find(dictionnary, order[1])
                     if len(index) > 4: # normal
-                        dictionnary[index[0]][index[1]][index[4]][2] -= int((find(order[0])[2] + find(order[0])[3]) /10)
+                        dictionnary[index[0]][index[1]][index[4]][2] -= int((find(dictionnary['saved_energy'], order[0])[2] + find(dictionnary['saved_energy'], order[0])[3]) /10)
                         if dictionnary[index[0]][index[1]][index[4]][2] < 0:
                             dictionnary[index[0]][index[1]][index[4]][2] = 0
                     else: # alpha omega
-                        dictionnary[index[0]][index[1]][2] -= int((find(order[0])[2] + find(order[0])[3]) /10)
+                        dictionnary[index[0]][index[1]][2] -= int((find(dictionnary['saved_energy'], order[0])[2] + find(dictionnary['saved_energy'], order[0])[3]) /10)
                         if dictionnary[index[0]][index[1]][2] < 0:
                             dictionnary[index[0]][index[1]][2] = 0
                 else: 
@@ -532,93 +528,17 @@ def fighting(order):
     dictionnary['rounds'][1] = True
     dictionnary['wolfplayed'].append(order[0])
 
-def syntaxer(pos1, pos2, type):
-    """Return nicely orders for ia
-
-    Parameters
-    ----------
-    pos1(list): position of the first wolf
-    pos2(list): position of the second wolf
-    type (str): type of the action
-
-    Returns
-    -------
-    Return the orders nicely in str
-
-    Version
-    -------
-    specification: Hugo - Malo (v4 22/03/22)
-    """
-    if type == 'pacify':
-        return ('%d-%d:pacify' % (pos1[0],pos1[1]))
-    elif type == 'feed':
-        return ('%d-%d:<%d-%d' % (pos1[0],pos1[1],pos2[0],pos2[1]))
-    elif type == 'fight':
-        return ('%d-%d:*%d-%d' % (pos1[0],pos1[1],pos2[0],pos2[1]))
-    else:
-        return ('%d-%d:@%d-%d' % (pos1[0],pos1[1],pos2[0],pos2[1]))
-
-def generate_orders(team):
-    """Our dumb ai
-
-    Parameters
-    ----------
-    team(int): team of the player
-
-    Returns
-    -------
-    Return a list of order for the play game.
-
-    Version
-    -------
-    specification: Hugo - Malo (v4 24/03/22)
-    """
-    pos2 = [1, 1]
-    orders = {
-        'pacify' : [], # 1-1:pacify
-        'feed' : [], # 3-3:<4-4
-        'fight' : [], # 3-3:*3-2
-        'move' : [] # 3-3:@3-4
-    }
-
-    if randint(0,20) == 10:
-        orders['pacify'].append(syntaxer(dictionnary[team]['omega'][:2], 'pacify', 'pacify'))
-    else:
-        r = randint(0,4)
-        for j in range(0,2):
-            pos2[j] = (int(dictionnary[team]['omega'][j]) + randint(-1, 1))
-
-        if r == 0: 
-            orders['feed'].append(syntaxer(dictionnary[team]['omega'][:2], pos2, 'feed'))
-        elif r == 1: #fight
-            orders['fight'].append(syntaxer(dictionnary[team]['omega'][:2], pos2, 'fight'))
-        else: #move
-            orders['move'].append(syntaxer(dictionnary[team]['omega'][:2], pos2, 'move'))
-
-    for i in dictionnary[team]['normal']:
-        r = randint(0,4)
-        for j in range(0,2):
-            pos2[j] = (int(i[j]) + randint(-1, 1))
-
-        if r == 0: 
-            orders['feed'].append(syntaxer(i[:2], pos2, 'feed'))
-        elif r == 1: #fight
-            orders['fight'].append(syntaxer(i[:2], pos2, 'fight'))
-        else: #move
-            orders['move'].append(syntaxer(i[:2], pos2, 'move'))
-
-    r = randint(0,4)
-    for j in range(0,2):
-        pos2[j] = (int(dictionnary[team]['alpha'][j]) + randint(-1, 1))
-
-    if r == 0: 
-        orders['feed'].append(syntaxer(dictionnary[team]['alpha'][:2], pos2, 'feed'))
-    elif r == 1: #fight
-        orders['fight'].append(syntaxer(dictionnary[team]['alpha'][:2], pos2, 'fight'))
-    else: #move
-        orders['move'].append(syntaxer(dictionnary[team]['alpha'][:2], pos2, 'move'))
-
-    return orders
+def progress(progress : float, width : int):
+        # 0 <= progress <= 1
+        progress = min(1, max(0, progress))
+        whole_width = math.floor(progress * width)
+        remainder_width = (progress * width) % 1
+        part_width = math.floor(remainder_width * 8)
+        part_char = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉"][part_width]
+        if (width - whole_width - 1) < 0:
+          part_char = ""
+        line = "█" * whole_width + part_char + "*" * (width - whole_width - 1)
+        return line
 
 def play_game(group_1, type_1, group_2, type_2):
     """Play a game.
@@ -633,29 +553,29 @@ def play_game(group_1, type_1, group_2, type_2):
     
     Notes
     -----
-    Player type is either 'human', 'AI' or 'remote'.
+    Player type is either 'human', 'AI', 'dumb AI' or 'remote'.
     
     If there is an external referee, set group id to 0 for remote player.
     """
-
-    while nexturn() == 0 and dictionnary['rounds'][2] <= 200:
+    board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+    while nexturn() == 0:
         bonus()
+        print(term.home + term.clear)
         dictionnary['saved_energy'] = dictionnary.copy()
         dictionnary['rounds'][1] = False
         dictionnary['pacify'] = []
         dictionnary['wolfplayed'] = []
         orders= []
-
-        board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
         
         for i in [type_1, group_1], [type_2, group_2]:
             if i[0] == 'human':
                 orders.append(get_human_orders(i[1]))
-                print(term.home + term.clear)
-                board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
             elif i[0] == 'AI':
-                orders.append(generate_orders(i[1]))
+                orders.append(ai_engine_gr_19.generate_orders(dictionnary, i[1]))
+
+            elif i[0] == 'dumb_AI':
+                orders.append(ai_dumb_gr_19.generate_orders(dictionnary, i[1]))
                 
             elif i[0] == 'remote':
                 print('ok')
@@ -686,10 +606,16 @@ def play_game(group_1, type_1, group_2, type_2):
             dictionnary['rounds'][2] += 1
         else:
             dictionnary['rounds'][2] = 0
-        time.sleep(0.1)
-
-    print(nexturn())
         
-print(term.home + term.clear)
+        board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+        #time.sleep(0.5)
+    print(nexturn())
+
+print(term.clear)
 dictionnary = config('map.ano')
 play_game(1, 'AI', 2, 'AI')
+
+# NOTE:
+# Ajouter le mode remote
+# retirer le dictionnary du global
+# Ajouter barre de vie blessed example avec la vie moyenne de l'équipe
