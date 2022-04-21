@@ -12,7 +12,7 @@ def config(file):
 
     Version
     -------
-    specification: Hugo (v3 28/02/22)
+    specification: Marius (v3 28/02/22)
     """
     config = {
         1:{'alpha': '', 'omega': '', 'normal': []}, 
