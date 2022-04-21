@@ -619,3 +619,4 @@ play_game(1, 'AI', 2, 'AI')
 # Ajouter le mode remote
 # retirer le dictionnary du global
 # Ajouter barre de vie blessed example avec la vie moyenne de l'équipe
+# ça marche ?
