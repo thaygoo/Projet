@@ -620,3 +620,4 @@ play_game(1, 'AI', 2, 'AI')
 # retirer le dictionnary du global
 # Ajouter barre de vie blessed example avec la vie moyenne de l'équipe
 # ça marche ?
+#Là en gros c'est moi qui fait un test on va bien voir si ca marche hihi ^^
