@@ -1,5 +1,17 @@
 from random import *
 
+def team_group(dictionnary, team):
+    """
+    check if wolve's team are grouped
+    """
+
+def 
+
+
+
+
+
+
 def find(dictionnary, coos):
     """ Returns a list stats of a wolf according to its position
 

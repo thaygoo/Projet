@@ -19,7 +19,7 @@ def config(file):
         2:{'alpha': '', 'omega': '', 'normal': []}, 
         "food":{'berries': [], 'apples': [], 'mice': [], 'rabbits': [], 'deers': []}, 
         'map':(),
-        'pacify': [],
+        'pacify': (),
         'wolfplayed': [],
         'saved_energy': {},
         'stats': { 'healths': [0, 0]},
@@ -220,11 +220,11 @@ def nexturn():
         return "Well play ! Player 1 win !"
     elif dictionnary['rounds'][2] > 200:
         if dictionnary['rounds'][0] > dictionnary['rounds'][2]:
-            return "Player 1 win ! His total was %d, player 2 was %d" % (dictionnary['rounds'][0], dictionnary['rounds'][2])
+            return "Player 1 win ! His total was %d, player 2 was %d" % (dictionnary['rounds'][1], dictionnary['rounds'][2])
         elif dictionnary['rounds'][2] > dictionnary['rounds'][0]:
-            return "Player 2 win ! His total was %d, player 1 was %d" % (dictionnary['rounds'][0], dictionnary['rounds'][2])
+            return "Player 2 win ! His total was %d, player 1 was %d" % (dictionnary['rounds'][2], dictionnary['rounds'][1])
         else:
-            return "Both of the player has the same amount of live ! Player 1 was %d, player 2 was %d" % (dictionnary['rounds'][0], dictionnary['rounds'][2])
+            return "Both of the player has the same amount of live ! Player 1 was %d, player 2 was %d" % (dictionnary['rounds'][1], dictionnary['rounds'][2])
     else:
         return 0
 
@@ -272,7 +272,6 @@ def move(order, team):
         The wolf is trying to go too far
         The wolf is trying to get out of the map
 
-
     Version
     -------
     specification: Mathis (v2 17/03/22) """
@@ -303,7 +302,7 @@ def move(order, team):
                 else:
                     return "Error: you cannot go there."
             else:
-                    return "Error: This wolves already played."
+                return "Error: This wolves already played."
         else:
             return "ValueError: This wolve does not exist"
     else:
@@ -522,9 +521,9 @@ def fighting(order):
             else:
                 return "ValueError: Please verify that your wolve isn't pacified ?"
         else:
-            return 'ValueError: Please check that you are at enough distance to touch him.'    
+            return "ValueError: Please check that you are at enough distance to touch him."
     else: 
-        return 'ValueError: Please check that both of the wolves exists.'
+        return "ValueError: Please check that both of the wolves exists."
     dictionnary['rounds'][1] = True
     dictionnary['wolfplayed'].append(order[0])
 
@@ -608,14 +607,15 @@ def play_game(group_1, type_1, group_2, type_2):
             dictionnary['rounds'][2] = 0
         
         board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
-        #time.sleep(0.5)
+        #time.sleep(0.2)
     print(nexturn())
 
 print(term.clear)
 dictionnary = config('map.ano')
-play_game(1, 'AI', 2, 'AI')
+play_game(1, 'AI', 2, 'dumb_AI')
 
 # NOTE:
 # Ajouter le mode remote
+# Ne pas afficher les fruits si loups sur la même case
 # retirer le dictionnary du global
 # Ajouter barre de vie blessed example avec la vie moyenne de l'équipe
