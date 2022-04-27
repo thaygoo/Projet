@@ -12,7 +12,7 @@ def config(file):
 
     Version
     -------
-    specification: Hugo (v3 28/02/22)
+    specification: Marius (v3 28/02/22)
     """
     config = {
         1:{'alpha': '', 'omega': '', 'normal': []}, 
@@ -619,3 +619,4 @@ play_game(1, 'AI', 2, 'dumb_AI')
 # Ne pas afficher les fruits si loups sur la même case
 # retirer le dictionnary du global
 # Ajouter barre de vie blessed example avec la vie moyenne de l'équipe
+# On est dans un arbre ou quoient ?
