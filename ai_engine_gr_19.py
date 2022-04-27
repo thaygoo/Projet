@@ -5,7 +5,35 @@ def team_group(dictionnary, team):
     check if wolve's team are grouped
     """
 
-def 
+def assemble(dictionnary, team):
+    """
+    assemble wolves nicely
+    """
+
+def pacification(dictionnary, team):
+    """
+    check if it has a utility to pacify or not
+
+    is alpha going to die after this turn ?
+    """
+
+def defense(dictionnary, team):
+    """
+    put stronger wolf on the front of the attack and put the rest behind 
+    go eat to recover
+    """
+
+def finish(dictionnary, team):
+    """
+    check if it's possible to finish game and kill alpha
+    """
+
+def recovery(dictionnary, team):
+    """
+    heal the wolves
+    """
+
+
 
 
 
