@@ -3,6 +3,7 @@ from random import *
 def team_group(dictionnary, team):
     """
     check if wolve's team are grouped
+    return true or false
     """
 
 def assemble(dictionnary, team):
