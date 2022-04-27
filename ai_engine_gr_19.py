@@ -23,6 +23,12 @@ def defense(dictionnary, team):
     go eat to recover
     """
 
+def attack(dictionnary, team):
+    """
+    if in attack mode, attack all the other wolves.
+    wolves that are too low doesn't come with
+    """
+
 def finish(dictionnary, team):
     """
     check if it's possible to finish game and kill alpha
@@ -33,6 +39,23 @@ def recovery(dictionnary, team):
     heal the wolves
     """
 
+def humans(dictionnary, team):
+    """
+    return false if no human
+
+    if human automatically go to the nearest food, the best one (qui nourrit le mieux et le plus proche)
+    """
+
+def mode(dictionnary, team):
+    """
+    defensive or attack ?
+    in relation with global health and local
+    """
+
+def isolate(dictionnary, team):
+    """
+    if a wolve is alone do maximum to move him in the meute
+    """
 
 
 
