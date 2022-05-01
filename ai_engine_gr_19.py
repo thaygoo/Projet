@@ -58,11 +58,7 @@ def isolate(dictionnary, team):
     if a wolve is alone do maximum to move him in the meute
     """
 
-
-
-
-
-
+# -------------------------------------------------------------------
 
 def find(dictionnary, coos):
     """ Returns a list stats of a wolf according to its position
@@ -133,8 +129,12 @@ def generate_orders(dictionnary, team):
     Version
     -------
     specification: Hugo - Malo (v4 24/03/22)
+
+    orders['feed'].append(syntaxer(dictionnary[team]['alpha'][:2], pos2, 'feed'))
+    orders['pacify'].append(syntaxer(dictionnary[team]['omega'][:2], 'pacify', 'pacify'))
+    orders['feed'].append(syntaxer(dictionnary[team]['omega'][:2], pos2, 'feed'))
+    orders['feed'].append(syntaxer(i[:2], pos2, 'feed'))
     """
-    pos2 = [1, 1]
     orders = {
         'pacify' : [], # 1-1:pacify
         'feed' : [], # 3-3:<4-4
@@ -142,47 +142,6 @@ def generate_orders(dictionnary, team):
         'move' : [] # 3-3:@3-4
     }
 
-    if randint(0,20) == 10:
-        orders['pacify'].append(syntaxer(dictionnary[team]['omega'][:2], 'pacify', 'pacify'))
-    else:
-        r = randint(0,4)
-        for j in range(0,2):
-            pos2[j] = (int(dictionnary[team]['omega'][j]) + randint(-1, 1))
 
-        if r == 0: 
-            orders['feed'].append(syntaxer(dictionnary[team]['omega'][:2], pos2, 'feed'))
-        elif r == 1: #fight
-            if find(dictionnary, pos2):
-                if find(dictionnary, pos2)[0] != team:
-                    orders['fight'].append(syntaxer(dictionnary[team]['omega'][:2], pos2, 'fight'))
-        else: #move
-            orders['move'].append(syntaxer(dictionnary[team]['omega'][:2], pos2, 'move'))
-
-    for i in dictionnary[team]['normal']:
-        r = randint(0,4)
-        for j in range(0,2):
-            pos2[j] = (int(i[j]) + randint(-1, 1))
-
-        if r == 0:
-            orders['feed'].append(syntaxer(i[:2], pos2, 'feed'))
-        elif r == 1: #fight
-            if find(dictionnary, pos2):
-                if find(dictionnary, pos2)[0] != team:
-                    orders['fight'].append(syntaxer(i[:2], pos2, 'fight'))
-        else: #move
-            orders['move'].append(syntaxer(i[:2], pos2, 'move'))
-
-    r = randint(0,4)
-    for j in range(0,2):
-        pos2[j] = (int(dictionnary[team]['alpha'][j]) + randint(-1, 1))
-
-    if r == 0: 
-        orders['feed'].append(syntaxer(dictionnary[team]['alpha'][:2], pos2, 'feed'))
-    elif r == 1: #fight
-        if find(dictionnary, pos2):
-                if find(dictionnary, pos2)[0] != team:
-                    orders['fight'].append(syntaxer(dictionnary[team]['alpha'][:2], pos2, 'fight'))
-    else: #move
-        orders['move'].append(syntaxer(dictionnary[team]['alpha'][:2], pos2, 'move'))
 
     return orders

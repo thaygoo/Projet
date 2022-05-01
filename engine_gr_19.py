@@ -73,13 +73,11 @@ def coordinate(x, y):
 
 def board(width, height, color):
     """Creation of the board, placing all the things on it.
-
     Parameters
     ----------
     width (int) : width of the board
     height (int) : height of the board
     color (str) : color of the board
-
     Version
     -------
     specification: Hugo - Malo (v3 28/02/22)
@@ -93,7 +91,7 @@ def board(width, height, color):
 
     #coordinate numbers
     for i in range(0, int(dictionnary['map'][0])+1, 5): # X 
-        print(term.normal + term.bold + term.move_xy(coordinate(i, 0)[0], 0) + color + f'{i}')
+        print(term.on_gray25 + term.bold + term.move_xy(coordinate(i, 0)[0], 0) + color + f'{i}')
 
     for i in range(0, int(dictionnary['map'][1])+1, 5): # Y
         print(term.move_xy(int(term.width/2) - int(((4 * int(dictionnary['map'][0]))+1)/2)-2, (i*2)) + f'{i}')
@@ -110,7 +108,7 @@ def board(width, height, color):
         print(term.move_xy(center, i + y) + color + '║' + width * (3 * ' ' + '║'), end='')
         
     #foot
-    print(term.move_xy(center, (height*2)+1) + color + '╚' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╝', end='')
+    print(term.move_xy(center, (height*2)+1) + color + '╠' + 3 * '═' + (int(width) - 1) * ('╩' + 3 * '═') + '╣', end='')
 
     #placing objects
     #place foods
@@ -121,7 +119,7 @@ def board(width, height, color):
             # Display energy of foods
             print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + term.turquoise + f'{i[2]}')
 
-    #Placing Alphas :
+    # Placing Alphas :
     for i in ['alpha', "α"], ['omega', "Ω"]:
         for j in [1, term.bold_red], [2, term.bold_green]:
             if dictionnary[j[0]][i[0]][2] <= 0: # Human ?
@@ -149,12 +147,16 @@ def board(width, height, color):
                 # display energy of them
                 print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[1] + f'{i[2]}')
 
-    # Rounds
-    print(term.normal + term.move_xy(coordinate(1, 0)[0], 2+(2*int(dictionnary['map'][1]))) + term.bold + color + "Rounds %d " % dictionnary['rounds'][0])
-
     # Healths
-    print(term.normal + term.move_xy(coordinate(1, 0)[0], 3+(2*int(dictionnary['map'][1]))) + term.bold_red + progress((dictionnary[1]['alpha'][2]/100), 50))
-    print(term.normal + term.move_xy(coordinate(1, 0)[0], 4+(2*int(dictionnary['map'][1]))) + term.bold_green + progress((dictionnary[2]['alpha'][2]/100), 50))
+    print(term.move_xy(center, (height*2)+2) + color + '║' + width * (3*' ') + (19 * ' ') + '║', end='')
+    print(term.move_xy(center, (height*2)+3) + color + '╠' + 3 * '═' + (int(width) - 1) * (4 * '═') + '╣', end='')
+    print(term.move_xy(center, (height*2)+4) + color + '║' + width * (3*' ') + (19 * ' ') + '║', end='')
+    print(term.move_xy(center, (height*2)+5) + color + '╚' + 3 * '═' + (int(width) - 1) * (4 * '═') + '╝', end='')
+    print(term.move_xy(coordinate(1, 0)[0] - 1, 2+(2*int(dictionnary['map'][1]))) + term.bold_red + progress((dictionnary[1]['alpha'][2]/100), (width*4)-1))
+    print(term.move_xy(coordinate(1, 0)[0] - 1, 4+(2*int(dictionnary['map'][1]))) + term.bold_green + progress((dictionnary[2]['alpha'][2]/100), (width*4)-1))
+
+    # Rounds
+    print(term.normal + term.on_gray25  + term.move_xy(coordinate(1, 0)[0], 6+(2*int(dictionnary['map'][1]))) + term.bold + color + "Rounds %d " % dictionnary['rounds'][0]) 
 
 def get_human_orders(player):
     """Input asking for human orders using a specific format and associate orders with adequate function
@@ -463,7 +465,6 @@ def feeding(order, team):
                     else: # food not enought to heal max energy
                         dictionnary[team][index[1]][2] += dictionnary['food'][foodindex[1]][foodindex[0]][2]
                         dictionnary['food'][foodindex[1]][foodindex[0]][2] = 0
-
             else:
                 return "ValueError : Please check that the food really exist or isn't empty."
         else:
@@ -536,7 +537,7 @@ def progress(progress : float, width : int):
         part_char = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉"][part_width]
         if (width - whole_width - 1) < 0:
           part_char = ""
-        line = "█" * whole_width + part_char + "*" * (width - whole_width - 1)
+        line = "█" * whole_width + part_char + " " * (width - whole_width - 1)
         return line
 
 def play_game(group_1, type_1, group_2, type_2):
