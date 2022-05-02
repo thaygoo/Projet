@@ -1,4 +1,4 @@
-import blessed, time, math, ai_dumb_gr_19, ai_engine_gr_19
+import blessed, time, math, ai_dumb_gr_19, ai_engine_gr_19, distancemodule
 from random import *
 
 term = blessed.Terminal()
@@ -148,9 +148,9 @@ def board(width, height, color):
                 print(term.move_xy((coordinate(*i[:2])[0])-1, (coordinate(*i[:2])[1])+1) + j[1] + f'{i[2]}')
 
     # Healths
-    print(term.move_xy(center, (height*2)+2) + color + '║' + width * (3*' ') + (19 * ' ') + '║', end='')
+    print(term.move_xy(center, (height*2)+2) + color + '║' + width * (3*' ') + ((width-1) * ' ') + '║', end='')
     print(term.move_xy(center, (height*2)+3) + color + '╠' + 3 * '═' + (int(width) - 1) * (4 * '═') + '╣', end='')
-    print(term.move_xy(center, (height*2)+4) + color + '║' + width * (3*' ') + (19 * ' ') + '║', end='')
+    print(term.move_xy(center, (height*2)+4) + color + '║' + width * (3*' ') + ((width-1) * ' ') + '║', end='')
     print(term.move_xy(center, (height*2)+5) + color + '╚' + 3 * '═' + (int(width) - 1) * (4 * '═') + '╝', end='')
     print(term.move_xy(coordinate(1, 0)[0] - 1, 2+(2*int(dictionnary['map'][1]))) + term.bold_red + progress((dictionnary[1]['alpha'][2]/100), (width*4)-1))
     print(term.move_xy(coordinate(1, 0)[0] - 1, 4+(2*int(dictionnary['map'][1]))) + term.bold_green + progress((dictionnary[2]['alpha'][2]/100), (width*4)-1))
@@ -558,6 +558,12 @@ def play_game(group_1, type_1, group_2, type_2):
     If there is an external referee, set group id to 0 for remote player.
     """
     board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+
+    if type_1 == 'remote':
+        connection = distancemodule.create_connection(group_2, group_1)
+    elif type_2 == 'remote':
+        connection = distancemodule.create_connection(group_1, group_2)
+    
     while nexturn() == 0:
         bonus()
         print(term.home + term.clear)
@@ -570,15 +576,21 @@ def play_game(group_1, type_1, group_2, type_2):
         for i in [type_1, group_1], [type_2, group_2]:
             if i[0] == 'human':
                 orders.append(get_human_orders(i[1]))
+                if type_2 == 'remote' or type_1 == 'remote':
+                    distancemodule.notify_remote_orders(connection, orders)
 
             elif i[0] == 'AI':
                 orders.append(ai_engine_gr_19.generate_orders(dictionnary, i[1]))
+                if type_2 == 'remote' or type_1 == 'remote':
+                    distancemodule.notify_remote_orders(connection, orders)
 
             elif i[0] == 'dumb_AI':
                 orders.append(ai_dumb_gr_19.generate_orders(dictionnary, i[1]))
+                if type_2 == 'remote' or type_1 == 'remote':
+                    distancemodule.notify_remote_orders(connection, orders)
                 
             elif i[0] == 'remote':
-                print('ok')
+                orders.append(distancemodule.get_remote_orders(connection))
 
             else:
                 return 'ValueError: Wrong type of player.'
@@ -598,7 +610,7 @@ def play_game(group_1, type_1, group_2, type_2):
 
             # Fourth step : Move
             for j in orders[i]['move']:
-                    move(j, (i +1))
+                move(j, (i +1))
 
         dictionnary['rounds'][0] += 1
         
@@ -608,16 +620,11 @@ def play_game(group_1, type_1, group_2, type_2):
             dictionnary['rounds'][2] = 0
         
         board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
-        #time.sleep(0.2)
+        time.sleep(0.1)
     print(nexturn())
+    if type_1 == 'remote' or type_2 == 'remote':
+        distancemodule.close_connection(connection)
 
 print(term.clear)
 dictionnary = config('map.ano')
-play_game(1, 'AI', 2, 'dumb_AI')
-
-# NOTE:
-# Ajouter le mode remote
-# Ne pas afficher les fruits si loups sur la même case
-# retirer le dictionnary du global
-# Ajouter barre de vie blessed example avec la vie moyenne de l'équipe
-# On est dans un arbre ou quoient ?
+play_game(1, 'remote', 2, 'dumb_AI')
