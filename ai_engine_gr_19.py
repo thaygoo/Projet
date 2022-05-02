@@ -1,5 +1,3 @@
-from random import *
-
 orders = {
         'pacify' : [], # 1-1:pacify
         'feed' : [], # 3-3:<4-4
@@ -7,36 +5,28 @@ orders = {
         'move' : [] # 3-3:@3-4
     }
 
+wolfplayed = []
+
 def human(dictionnary, team):
-    """
-    return false if no human
+    for wolf in dictionnary[team]['normal']:
+        if wolf[2] <= 0:
+            recover(wolf[:2], dictionnary, team)
 
-    if human automatically go to the nearest food, the best one (qui nourrit le mieux et le plus proche)
-    """
+    if dictionnary[team]['omega'][2] <= 0:
+        recover(dictionnary[team]['omega'][:2], dictionnary, team)
 
-def pacific(dictionnary, team):
-    """
-    check if it has a utility to pacify or not
-
-    is alpha going to die after this turn ?
-    """
-
-def defense(dictionnary, team):
-    """
-    put stronger wolf on the front of the attack and put the rest behind 
-    go eat to recover
-    """
-
-def attack(dictionnary, team):
-    """
-    if in attack mode, attack all the other wolves.
-    wolves that are too low doesn't come with
-    """
-
-def recover(dictionnary, team):
-    """
-    heal the wolves
-    """
+def recover(wolf, dictionnary, team):
+    if -2 < (wolf[:2][0] - bestfood(dictionnary, wolf[:2])[0]) < 2 and -2 < (wolf[:2][1] - bestfood(dictionnary, wolf[:2])[1]) < 2:
+        orders['feed'].append(syntaxer(wolf[:2],bestfood(dictionnary, wolf[:2]),'feed'))
+    else:
+        coos = wolf[:2]
+        for i in range(0,2):
+            if bestfood(dictionnary, wolf[:2])[i] > wolf[:2][i]:
+                coos[i] += 1
+            elif bestfood(dictionnary, wolf[:2])[i] < wolf[:2][i]:
+                coos[i] -= 1
+        orders['move'].append(syntaxer(wolf[:2], coos,'move'))
+        wolfplayed.append(wolf[:2])
 
 def find(dictionnary, coos):
     """ Returns a list stats of a wolf according to its position
@@ -92,6 +82,21 @@ def findfood(dictionnary, coos):
                     #return le type de food et sa valeur nutritionelle
                     return [j,i,dictionnary['food'][i][j][2]]
 
+def bestfood(dictionnary, coos):
+  foods = []
+  k = 1
+  while len(foods) < 3:
+    k += 1
+    for i in range (-k, k+1):
+      for j in range(-k, k+1):
+        x = i+int(coos[0])
+        y = j+int(coos[1])
+        if 0 < x < int(dictionnary['map'][0])+1 and 0 < y < int(dictionnary['map'][1])+1:
+          if findfood(dictionnary, [x, y]):
+            foods.append([findfood(dictionnary, [x, y])[2], [x,y]])
+
+  return max(foods)[1]
+
 def syntaxer(pos1, pos2, type):
     """Return nicely orders for ia
 
@@ -134,6 +139,12 @@ def generate_orders(dictionnary, team):
     specification: Hugo - Malo (v4 24/03/22)
     """
 
-    
+    human(dictionnary, team)
+    if dictionnary[team]['alpha'][2] < 70:
+        recover(dictionnary[team]['alpha'][:2], dictionnary, team)
+        #reste de la meute attaque ou protège, omega pacifie
+    #else:
+        #play(dictionnary, team)
+
 
     return orders

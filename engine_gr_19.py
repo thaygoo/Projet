@@ -626,5 +626,5 @@ def play_game(group_1, type_1, group_2, type_2):
         distancemodule.close_connection(connection)
 
 print(term.clear)
-dictionnary = config('map.ano')
+dictionnary = config('map10.ano')
 play_game(1, 'AI', 2, 'dumb_AI')
