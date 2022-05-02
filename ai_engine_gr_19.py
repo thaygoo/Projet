@@ -1,23 +1,25 @@
 from random import *
 
-orders = {
-        'pacify' : [], 
-        'feed' : [],
-        'fight' : [],
-        'move' : []
-    }
+def move(order, wolf, pos2, dictionnary, team, orders):
+    """Find the three nearest source of food and select the biggest one.
 
-wolfplayed = []
+    Parameters
+    ----------
+    order(str): order type
+    wolf(list): position of the wolf
+    pos2(list): position of the aim
+    dictionnary (dic) : The main dictionnary
+    orders(dic): orders dictionnary
+    team(int): team of the wolf 
 
-def human(dictionnary, team):
-    for wolf in dictionnary[team]['normal']:
-        if wolf[2] <= 0:
-            move('feed', wolf[:2], bestfood(dictionnary, wolf[:2]), dictionnary)
+    Returns
+    -------
+    Return the biggest food
 
-    if dictionnary[team]['omega'][2] <= 0:
-        move('feed', dictionnary[team]['omega'][:2], bestfood(dictionnary, wolf[:2]), dictionnary)
-
-def move(order, wolf, pos2, dictionnary):
+    Version
+    -------
+    specification: Marius - Hugo (v2 25/04/22)
+    """
     if -2 < (wolf[:2][0] - pos2[0]) < 2 and -2 < (wolf[:2][1] - pos2[1]) < 2:
         orders[order].append(syntaxer(wolf[:2], pos2, order))
     else:
@@ -28,26 +30,31 @@ def move(order, wolf, pos2, dictionnary):
             elif pos2[i] < wolf[:2][i]:
                 coos[i] -= 1
         if find(dictionnary, coos):
-            coos[0] += randint(-1,1)
-            coos[1] += randint(-1,1)
-        orders['move'].append(syntaxer(wolf[:2], coos,'move'))
-        wolfplayed.append(wolf[:2])
+            if find(dictionnary, coos)[2] > 0 and find(dictionnary, coos)[0] != team:
+                orders['fight'].append(syntaxer(wolf[:2], coos,'fight'))
+            else:
+                coos[0] += randint(-1,1)
+                coos[1] += randint(-1,1)
+                orders['move'].append(syntaxer(wolf[:2], coos,'move'))
+        else:
+            orders['move'].append(syntaxer(wolf[:2], coos,'move'))
 
 def find(dictionnary, coos):
     """ Returns a list stats of a wolf according to its position
 
     Parameters
     ----------
-    coos (List): coordinates of a wolf (ex : find([3-3]))
+    coos (List): coordinates of a wolf (ex : find([3,3]))
+    dictionnary (dic) : The main dictionnary
 
     Return
     ------
     (List): 
-        [1] Player owning the wolf
-        [2] Type of the wolf
-        [3] Energy of the wolf
-        [4] Bonus
-        [5] (Only for normal wolves) : Position of the wolf in the dictionnary
+        [0] Player owning the wolf
+        [1] Type of the wolf
+        [2] Energy of the wolf
+        [3] Bonus
+        [4] (Only for normal wolves) : Position of the wolf in the dictionnary
 
     Version
     -------
@@ -68,6 +75,7 @@ def findfood(dictionnary, coos):
         Parameters
         ----------
         coos(list) coordinates of the food (ex: [4-4])
+        dictionnary (dic) : The main dictionnary
 
         Returns
         -------
@@ -88,19 +96,34 @@ def findfood(dictionnary, coos):
                     return [j,i,dictionnary['food'][i][j][2]]
 
 def bestfood(dictionnary, coos):
-  foods = []
-  k = 1
-  while len(foods) < 3:
-    k += 1
-    for i in range (-k, k+1):
-      for j in range(-k, k+1):
-        x = i+int(coos[0])
-        y = j+int(coos[1])
-        if 0 < x < int(dictionnary['map'][0])+1 and 0 < y < int(dictionnary['map'][1])+1:
-          if findfood(dictionnary, [x, y]):
-            foods.append([findfood(dictionnary, [x, y])[2], [x,y]])
+    """Find the three nearest source of food and select the biggest one.
 
-  return max(foods)[1]
+    Parameters
+    ----------
+    coos(list): position of the eater
+    dictionnary (dic) : The main dictionnary
+
+    Returns
+    -------
+    Return the biggest food
+
+    Version
+    -------
+    specification: Mathis - Malo (v4 29/04/22)
+    """
+    foods = []
+    k = 1
+    while len(foods) < 3:
+        k += 1
+        for i in range (-k, k+1):
+            for j in range(-k, k+1):
+                x = i+int(coos[0])
+                y = j+int(coos[1])
+                if 0 < x < int(dictionnary['map'][0])+1 and 0 < y < int(dictionnary['map'][1])+1:
+                    if findfood(dictionnary, [x, y]):
+                        foods.append([findfood(dictionnary, [x, y])[2], [x,y]])
+
+    return max(foods)[1]
 
 def syntaxer(pos1, pos2, type):
     """Return nicely orders for ia
@@ -134,6 +157,7 @@ def generate_orders(dictionnary, team):
     Parameters
     ----------
     team(int): team of the player
+    dictionnary (dic) : The main dictionnary
 
     Returns
     -------
@@ -143,20 +167,38 @@ def generate_orders(dictionnary, team):
     -------
     specification: Hugo - Malo (v4 24/03/22)
     """
+    orders = {
+        'pacify' : [], 
+        'feed' : [],
+        'fight' : [],
+        'move' : []
+    }
     enemyteam = 1
     if team == 1:
         enemyteam = 2        
 
-    human(dictionnary, team)
+    for wolf in dictionnary[team]['normal']:
+        if wolf[2] <= 0:
+            move('feed', wolf[:2], bestfood(dictionnary, wolf[:2]), dictionnary, team, orders)
+
+    if dictionnary[team]['omega'][2] <= 0:
+        move('feed', dictionnary[team]['omega'][:2], bestfood(dictionnary, wolf[:2]), dictionnary, team, orders)
+
     if dictionnary[team]['alpha'][2] < 80:
-        move('feed', dictionnary[team]['alpha'][:2], bestfood(dictionnary, dictionnary[team]['alpha'][:2]), dictionnary)
-        move('fight', dictionnary[team]['omega'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary)
-        move('fight', dictionnary[team]['alpha'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary)
+        move('feed', dictionnary[team]['alpha'][:2], bestfood(dictionnary, dictionnary[team]['alpha'][:2]), dictionnary, team, orders)
+        if dictionnary[team]['omega'][2] < 80:
+            move('fight', dictionnary[team]['omega'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary, team, orders)
+        else:
+            move('pacify', dictionnary[team]['omega'][:2], dictionnary[team]['omega'][:2], dictionnary, team, orders)
     else:
-        for wolf in dictionnary[team]['normal']:
-            #if find():
-            move('fight', wolf, dictionnary[enemyteam]['alpha'][:2], dictionnary)
-        move('fight', dictionnary[team]['omega'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary)
-        move('fight', dictionnary[team]['alpha'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary)
+        move('fight', dictionnary[team]['alpha'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary, team, orders)
+
+    for wolf in dictionnary[team]['normal']:
+        if wolf[2] < 40:
+            move('feed', wolf[:2], bestfood(dictionnary, wolf[:2]), dictionnary, team, orders)
+        else:
+            move('fight', wolf[:2], dictionnary[enemyteam]['alpha'][:2], dictionnary, team, orders)
+
+    move('fight', dictionnary[team]['omega'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary, team, orders)
 
     return orders

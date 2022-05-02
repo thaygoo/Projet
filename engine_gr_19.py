@@ -529,16 +529,25 @@ def fighting(order):
     dictionnary['wolfplayed'].append(order[0])
 
 def progress(progress : float, width : int):
-        # 0 <= progress <= 1
-        progress = min(1, max(0, progress))
-        whole_width = math.floor(progress * width)
-        remainder_width = (progress * width) % 1
-        part_width = math.floor(remainder_width * 8)
-        part_char = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉"][part_width]
-        if (width - whole_width - 1) < 0:
-          part_char = ""
-        line = "█" * whole_width + part_char + " " * (width - whole_width - 1)
-        return line
+    """Helpful to display the mains alpha health bar.
+    Parameters
+    ----------
+    progress (float) : progress of the bar
+    width (int) : width of the bar
+
+    Version
+    -------
+    specification: Hugo (v1 25/04/22)
+    """
+    progress = min(1, max(0, progress))
+    whole_width = math.floor(progress * width)
+    remainder_width = (progress * width) % 1
+    part_width = math.floor(remainder_width * 8)
+    part_char = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉"][part_width]
+    if (width - whole_width - 1) < 0:
+        part_char = ""
+    line = "█" * whole_width + part_char + " " * (width - whole_width - 1)
+    return line
 
 def play_game(group_1, type_1, group_2, type_2):
     """Play a game.
@@ -571,7 +580,7 @@ def play_game(group_1, type_1, group_2, type_2):
         dictionnary['rounds'][1] = False
         dictionnary['pacify'] = []
         dictionnary['wolfplayed'] = []
-        orders= []
+        orders = []
         
         for i in [type_1, group_1], [type_2, group_2]:
             if i[0] == 'human':
@@ -620,11 +629,12 @@ def play_game(group_1, type_1, group_2, type_2):
             dictionnary['rounds'][2] = 0
         
         board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
-        time.sleep(0.5)
+        time.sleep(1)
+        
     print(nexturn())
     if type_1 == 'remote' or type_2 == 'remote':
         distancemodule.close_connection(connection)
 
 print(term.clear)
 dictionnary = config('map.ano')
-play_game(1, 'AI', 2, 'dumb_AI')
+play_game(1, 'AI', 2, 'AI')
