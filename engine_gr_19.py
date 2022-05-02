@@ -620,11 +620,11 @@ def play_game(group_1, type_1, group_2, type_2):
             dictionnary['rounds'][2] = 0
         
         board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
-        time.sleep(0.1)
+        time.sleep(0.5)
     print(nexturn())
     if type_1 == 'remote' or type_2 == 'remote':
         distancemodule.close_connection(connection)
 
 print(term.clear)
 dictionnary = config('map.ano')
-play_game(1, 'AI', 2, 'AI')
+play_game(1, 'AI', 2, 'dumb_AI')
