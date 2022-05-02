@@ -627,4 +627,4 @@ def play_game(group_1, type_1, group_2, type_2):
 
 print(term.clear)
 dictionnary = config('map.ano')
-play_game(1, 'remote', 2, 'dumb_AI')
+play_game(1, 'AI', 2, 'dumb_AI')
