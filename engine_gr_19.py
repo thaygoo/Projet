@@ -221,12 +221,12 @@ def nexturn():
     elif dictionnary[2]["alpha"][2] <= 0: # player 2 lose
         return "Well play ! Player 1 win !"
     elif dictionnary['rounds'][2] > 200:
-        if dictionnary['rounds'][0] > dictionnary['rounds'][2]:
-            return "Player 1 win ! His total was %d, player 2 was %d" % (dictionnary['rounds'][1], dictionnary['rounds'][2])
-        elif dictionnary['rounds'][2] > dictionnary['rounds'][0]:
-            return "Player 2 win ! His total was %d, player 1 was %d" % (dictionnary['rounds'][2], dictionnary['rounds'][1])
+        if dictionnary['stats']['healths'][0] > dictionnary['stats']['healths'][1]:
+            return "Player 1 win ! His total was %d, player 2 was %d" % (dictionnary['stats']['healths'][0], dictionnary['stats']['healths'][1])
+        elif dictionnary['stats']['healths'][1] > dictionnary['stats']['healths'][0]:
+            return "Player 2 win ! His total was %d, player 1 was %d" % (dictionnary['stats']['healths'][1], dictionnary['stats']['healths'][0])
         else:
-            return "Both of the player has the same amount of live ! Player 1 was %d, player 2 was %d" % (dictionnary['rounds'][1], dictionnary['rounds'][2])
+            return "Both of the player has the same amount of live ! Player 1 was %d, player 2 was %d" % (dictionnary['stats']['healths'][0], dictionnary['stats']['healths'][1])
     else:
         return 0
 
@@ -626,5 +626,5 @@ def play_game(group_1, type_1, group_2, type_2):
         distancemodule.close_connection(connection)
 
 print(term.clear)
-dictionnary = config('map10.ano')
-play_game(1, 'AI', 2, 'dumb_AI')
+dictionnary = config('map.ano')
+play_game(1, 'AI', 2, 'AI')

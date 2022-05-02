@@ -10,20 +10,20 @@ wolfplayed = []
 def human(dictionnary, team):
     for wolf in dictionnary[team]['normal']:
         if wolf[2] <= 0:
-            recover(wolf[:2], dictionnary, team)
+            move('feed', wolf[:2], bestfood(dictionnary, wolf[:2]), dictionnary, team)
 
     if dictionnary[team]['omega'][2] <= 0:
-        recover(dictionnary[team]['omega'][:2], dictionnary, team)
+        move('feed', dictionnary[team]['omega'][:2], bestfood(dictionnary, wolf[:2]), dictionnary, team)
 
-def recover(wolf, dictionnary, team):
-    if -2 < (wolf[:2][0] - bestfood(dictionnary, wolf[:2])[0]) < 2 and -2 < (wolf[:2][1] - bestfood(dictionnary, wolf[:2])[1]) < 2:
-        orders['feed'].append(syntaxer(wolf[:2],bestfood(dictionnary, wolf[:2]),'feed'))
+def move(order, wolf, pos2, dictionnary, team):
+    if -2 < (wolf[:2][0] - pos2[0]) < 2 and -2 < (wolf[:2][1] - pos2[1]) < 2:
+        orders[order].append(syntaxer(wolf[:2], pos2, order))
     else:
         coos = wolf[:2]
         for i in range(0,2):
-            if bestfood(dictionnary, wolf[:2])[i] > wolf[:2][i]:
+            if pos2[i] > wolf[:2][i]:
                 coos[i] += 1
-            elif bestfood(dictionnary, wolf[:2])[i] < wolf[:2][i]:
+            elif pos2[i] < wolf[:2][i]:
                 coos[i] -= 1
         orders['move'].append(syntaxer(wolf[:2], coos,'move'))
         wolfplayed.append(wolf[:2])
@@ -138,13 +138,18 @@ def generate_orders(dictionnary, team):
     -------
     specification: Hugo - Malo (v4 24/03/22)
     """
+    if team == 1:
+        enemyteam = 2
+    else:
+        enemyteam = 1
 
     human(dictionnary, team)
     if dictionnary[team]['alpha'][2] < 70:
-        recover(dictionnary[team]['alpha'][:2], dictionnary, team)
+        move('feed', dictionnary[team]['alpha'][:2], bestfood(dictionnary, wolf[:2]), dictionnary, team)
         #reste de la meute attaque ou protège, omega pacifie
-    #else:
-        #play(dictionnary, team)
-
-
+    else:
+        for wolf in dictionnary[team]['normal']:
+            move('fight', wolf, dictionnary[enemyteam]['alpha'][:2], dictionnary, team)
+        move('fight', dictionnary[team]['omega'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary, team)
+        move('fight', dictionnary[team]['alpha'][:2], dictionnary[enemyteam]['alpha'][:2], dictionnary, team)
     return orders
