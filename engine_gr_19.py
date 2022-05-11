@@ -1,5 +1,6 @@
-import blessed, time, math, ai_dumb_gr_19, ai_engine_gr_19, distancemodule
+import blessed, time, math, ai_engine_gr_19
 from random import *
+from distancemodule import *
 
 term = blessed.Terminal()
 
@@ -572,9 +573,9 @@ def play_game(group_1, type_1, group_2, type_2):
     connection_2 = ''
 
     if type_1 == 'remote':
-        connection_1 = distancemodule.create_connection(group_2, group_1)
+        connection_1 = create_connection(group_2, group_1)
     elif type_2 == 'remote':
-        connection_2 = distancemodule.create_connection(group_1, group_2)
+        connection_2 = create_connection(group_1, group_2)
     
     while nexturn() == 0:
         bonus()
@@ -591,19 +592,16 @@ def play_game(group_1, type_1, group_2, type_2):
 
             elif i[0] == 'AI':
                 orders.append(ai_engine_gr_19.generate_orders(dictionnary, i[1]))
-
-            elif i[0] == 'dumb_AI':
-                orders.append(ai_dumb_gr_19.generate_orders(dictionnary, i[1]))
                 
             elif i[0] == 'remote':
                 if type_1 == 'remote':
-                    orders.append(distancemodule.get_remote_orders(connection_1))
+                    orders.append(get_remote_orders(connection_1))
                     if type_2 == 'remote':
-                        distancemodule.notify_remote_orders(connection_2, orders)
+                        notify_remote_orders(connection_2, orders)
                 if type_2 == 'remote':
-                    orders.append(distancemodule.get_remote_orders(connection_2))
+                    orders.append(get_remote_orders(connection_2))
                     if type_1 == 'remote':
-                        distancemodule.notify_remote_orders(connection_1, orders)
+                        notify_remote_orders(connection_1, orders)
 
             else:
                 return 'ValueError: Wrong type of player.'
@@ -637,9 +635,9 @@ def play_game(group_1, type_1, group_2, type_2):
         
     print(nexturn())
     if type_1 == 'remote':
-        distancemodule.close_connection(connection_1)
+        close_connection(connection_1)
     if type_2 == 'remote':
-        distancemodule.close_connection(connection_2)
+        close_connection(connection_2)
 
 print(term.clear)
 dictionnary = config('vertical.ano')
