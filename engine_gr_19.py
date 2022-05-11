@@ -568,10 +568,13 @@ def play_game(group_1, type_1, group_2, type_2):
     """
     board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
+    connection_1 = ''
+    connection_2 = ''
+
     if type_1 == 'remote':
-        connection = distancemodule.create_connection(group_2, group_1)
+        connection_1 = distancemodule.create_connection(group_2, group_1)
     elif type_2 == 'remote':
-        connection = distancemodule.create_connection(group_1, group_2)
+        connection_2 = distancemodule.create_connection(group_1, group_2)
     
     while nexturn() == 0:
         bonus()
@@ -585,21 +588,20 @@ def play_game(group_1, type_1, group_2, type_2):
         for i in [type_1, group_1], [type_2, group_2]:
             if i[0] == 'human':
                 orders.append(get_human_orders(i[1]))
-                if type_2 == 'remote' or type_1 == 'remote':
-                    distancemodule.notify_remote_orders(connection, orders)
 
             elif i[0] == 'AI':
                 orders.append(ai_engine_gr_19.generate_orders(dictionnary, i[1]))
-                if type_2 == 'remote' or type_1 == 'remote':
-                    distancemodule.notify_remote_orders(connection, orders)
 
             elif i[0] == 'dumb_AI':
                 orders.append(ai_dumb_gr_19.generate_orders(dictionnary, i[1]))
-                if type_2 == 'remote' or type_1 == 'remote':
-                    distancemodule.notify_remote_orders(connection, orders)
                 
             elif i[0] == 'remote':
-                orders.append(distancemodule.get_remote_orders(connection))
+                if type_1 == 'remote':
+                    orders.append(distancemodule.get_remote_orders(connection_1))
+                    distancemodule.notify_remote_orders(connection_2, orders)
+                if type_2 == 'remote':
+                    orders.append(distancemodule.get_remote_orders(connection_2))
+                    distancemodule.notify_remote_orders(connection_1, orders)
 
             else:
                 return 'ValueError: Wrong type of player.'
@@ -632,9 +634,11 @@ def play_game(group_1, type_1, group_2, type_2):
         time.sleep(1)
         
     print(nexturn())
-    if type_1 == 'remote' or type_2 == 'remote':
-        distancemodule.close_connection(connection)
+    if type_1 == 'remote':
+        distancemodule.close_connection(connection_1)
+    if type_2 == 'remote':
+        distancemodule.close_connection(connection_2)
 
 print(term.clear)
-dictionnary = config('map.ano')
-play_game(1, 'AI', 2, 'AI')
+dictionnary = config('vertical.ano')
+play_game(1, 'remote', 2, 'AI')

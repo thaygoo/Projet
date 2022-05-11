@@ -9,7 +9,10 @@ Author: Benoit Frenay (benoit.frenay@unamur.be).
 
 """
 
+
+
 import socket
+import struct
 import time
 
 
@@ -280,7 +283,8 @@ def notify_remote_orders(connection, orders):
     
     # send orders
     try:
-        connection['out'].sendall(orders.encode())
+        tosend = struct.pack(f"!h{len(orders)}s", len(orders), orders.encode())
+        connection['out'].sendall(tosend)
     except:
         raise IOError('remote player cannot be reached')
 
@@ -304,7 +308,8 @@ def get_remote_orders(connection):
    
     # receive orders    
     try:
-        orders = connection['in'].recv(65536).decode()
+        toreceive = struct.unpack("!h", connection['in'].recv(2))[0]
+        orders = connection['in'].recv(toreceive).decode()
     except:
         raise IOError('remote player cannot be reached')
         
