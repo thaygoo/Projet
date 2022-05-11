@@ -566,7 +566,7 @@ def play_game(group_1, type_1, group_2, type_2):
     
     If there is an external referee, set group id to 0 for remote player.
     """
-    board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+    #board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
 
     connection_1 = ''
     connection_2 = ''
@@ -598,10 +598,12 @@ def play_game(group_1, type_1, group_2, type_2):
             elif i[0] == 'remote':
                 if type_1 == 'remote':
                     orders.append(distancemodule.get_remote_orders(connection_1))
-                    distancemodule.notify_remote_orders(connection_2, orders)
+                    if type_2 == 'remote':
+                        distancemodule.notify_remote_orders(connection_2, orders)
                 if type_2 == 'remote':
                     orders.append(distancemodule.get_remote_orders(connection_2))
-                    distancemodule.notify_remote_orders(connection_1, orders)
+                    if type_1 == 'remote':
+                        distancemodule.notify_remote_orders(connection_1, orders)
 
             else:
                 return 'ValueError: Wrong type of player.'
@@ -630,7 +632,7 @@ def play_game(group_1, type_1, group_2, type_2):
         else:
             dictionnary['rounds'][2] = 0
         
-        board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
+        #board(int(dictionnary['map'][0]), int(dictionnary['map'][1]), term.gold)
         time.sleep(1)
         
     print(nexturn())
